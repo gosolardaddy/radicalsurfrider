@@ -1384,7 +1384,7 @@ function spawnParticles(x, y) {
 }
 
 function spawnBonusWave() {
-  const w = 60, h = 44;
+  const w = 64, h = 24;
   bonusWaves.push({
     x: 16 + Math.random() * (GW - 32 - w),
     y: -h - 20, w, h,
@@ -1398,58 +1398,42 @@ function drawBonusWave(o) {
   const y = Math.floor(o.y);
   const p = 4;
   const BK = '#111111';
-  const WH = '#dff4f6';  // white foam
-  const LT = '#72cacc';  // light teal face
-  const MB = '#2e88b4';  // medium blue body
-  const DB = '#1a5e88';  // dark blue deep
+  const WH = '#ffffff';    // white wave crests
+  const LT = '#2ec8e0';   // bright teal (ocean surface)
+  const MT = '#1898b8';   // medium teal (depth stripe)
 
-  // CRESTING OCEAN WAVE — foam peaks upper-right, body sweeps down to lower-left
-  // Row 0: foam tip (upper right)
-  px(x+p*5,  y,      p,    p,   BK);
-  px(x+p*6,  y,      p*4,  p,   WH);
-  px(x+p*10, y,      p,    p,   BK);
+  // OCEAN WAVE TILE — repeating white arch crests on bright teal background
+  // 16 blocks wide × 6 blocks tall (64×24 px)
 
-  // Row 1: crest widens left
-  px(x+p*3,  y+p,    p,    p,   BK);
-  px(x+p*4,  y+p,    p*2,  p,   WH);
-  px(x+p*6,  y+p,    p*3,  p,   LT);
-  px(x+p*9,  y+p,    p,    p,   BK);
+  // 1. Full teal background
+  px(x, y, p*16, p*6, LT);
 
-  // Row 2: upper wave face, body starts
-  px(x+p*2,  y+p*2,  p,    p,   BK);
-  px(x+p*3,  y+p*2,  p*2,  p,   WH);
-  px(x+p*5,  y+p*2,  p*3,  p,   LT);
-  px(x+p*8,  y+p*2,  p*2,  p,   MB);
-  px(x+p*10, y+p*2,  p,    p,   BK);
+  // 2. Darker teal depth stripe at bottom
+  px(x+p, y+p*4, p*14, p, MT);
 
-  // Row 3: wave rises — more body
-  px(x+p,    y+p*3,  p,    p,   BK);
-  px(x+p*2,  y+p*3,  p*2,  p,   LT);
-  px(x+p*4,  y+p*3,  p*3,  p,   MB);
-  px(x+p*7,  y+p*3,  p*3,  p,   DB);
-  px(x+p*10, y+p*3,  p,    p,   BK);
+  // 3. Wave crest peaks (narrow tips of each arch)
+  px(x+p*2,  y+p*2, p*2, p, WH);   // arch 1 peak
+  px(x+p*7,  y+p*2, p*2, p, WH);   // arch 2 peak
+  px(x+p*12, y+p*2, p*2, p, WH);   // arch 3 peak
 
-  // Row 4: wide body
-  px(x,      y+p*4,  p,    p,   BK);
-  px(x+p,    y+p*4,  p*2,  p,   LT);
-  px(x+p*3,  y+p*4,  p*3,  p,   MB);
-  px(x+p*6,  y+p*4,  p*4,  p,   DB);
-  px(x+p*10, y+p*4,  p,    p,   BK);
+  // 4. Wave crest bodies (wider arch bases, teal valleys between)
+  px(x+p,    y+p*3, p*4, p, WH);   // arch 1 body (cols 1-4)
+  // col 5 = valley (teal background shows through)
+  px(x+p*6,  y+p*3, p*4, p, WH);   // arch 2 body (cols 6-9)
+  // col 10 = valley
+  px(x+p*11, y+p*3, p*4, p, WH);   // arch 3 body (cols 11-14)
 
-  // Row 5: lower body
-  px(x,      y+p*5,  p,    p,   BK);
-  px(x+p,    y+p*5,  p*2,  p,   MB);
-  px(x+p*3,  y+p*5,  p*7,  p,   DB);
-  px(x+p*10, y+p*5,  p,    p,   BK);
-
-  // Row 6: base
-  px(x,      y+p*6,  p*11, p,   BK);
+  // 5. Black outline (drawn last, over everything)
+  px(x,       y,      p*16, p,   BK);  // top
+  px(x,       y+p*5,  p*16, p,   BK);  // bottom
+  px(x,       y+p,    p,    p*4, BK);  // left
+  px(x+p*15,  y+p,    p,    p*4, BK);  // right
 
   // +100 LABEL
   ctx.fillStyle = '#ffff00';
   ctx.font = '8px "Press Start 2P"';
   ctx.textAlign = 'center';
-  ctx.fillText('+100', x + p*5, y - p);
+  ctx.fillText('+100', x + p*8, y - p);
 }
 
 // ---- COLLISION ----
