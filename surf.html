@@ -1404,71 +1404,92 @@ function drawBonusWave(o) {
   const s1 = Math.round(Math.sin(t)       * 2);
   const s2 = Math.round(Math.sin(t + 1.2) * 2);
   const s3 = Math.round(Math.sin(t + 2.4) * 2);
+  const s4 = Math.round(Math.sin(t + 3.6) * 2);
   const foamA = 0.55 + Math.abs(Math.sin(t * 1.4)) * 0.45;
 
-  const BL = '#3ab4ee';  // bright light blue — main body
-  const MB = '#1a7acc';  // medium blue — arc stripes
-  const DB = '#0e4e96';  // dark blue — depth
-  const HI = '#b8e0f8';  // highlight at crest
+  const BL = '#3ab4ee';  // light blue — body
+  const MB = '#1a7acc';  // medium blue — arcs
+  const DB = '#0e4e96';  // dark blue — deep arcs
+  const HI = '#b8e0f8';  // crest highlight
   const FM = '#ffffff';  // foam
 
-  // === BODY — dome, 80×44 ===
-  px(x+20, y,    40, 4, BL);
-  px(x+12, y+4,  56, 4, BL);
-  px(x+4,  y+8,  72, 4, BL);
-  px(x,    y+12, 80, 4, BL);
-  px(x,    y+16, 80, 4, BL);
-  px(x,    y+20, 80, 4, BL);
-  px(x,    y+24, 80, 4, BL);
-  px(x,    y+28, 76, 4, BL);
-  px(x+4,  y+32, 68, 4, BL);
-  px(x+8,  y+36, 56, 4, BL);
-  px(x+16, y+40, 40, 4, BL);
+  // === WAVE BODY — asymmetric wave shape ===
+  // Steep vertical face on LEFT, crest at top, base extends RIGHT
+  // (left edge steps IN at bottom, right edge stays WIDE = base/tail)
+  px(x+16, y,      40, 4, BL); // crest  [cols 4–13]
+  px(x+ 8, y+ 4,   60, 4, BL); // [2–16]
+  px(x+ 4, y+ 8,   72, 4, BL); // [1–18]
+  px(x,    y+12,   76, 4, BL); // [0–18]
+  px(x,    y+16,   80, 4, BL); // full
+  px(x,    y+20,   80, 4, BL); // full
+  px(x,    y+24,   80, 4, BL); // full
+  px(x+ 4, y+28,   76, 4, BL); // left steps IN, right stays out
+  px(x+ 8, y+32,   72, 4, BL);
+  px(x+16, y+36,   64, 4, BL); // base thins on left, extends right
+  px(x+24, y+40,   56, 4, BL); // thin tail extends to the right
 
-  // === DEPTH — dark lower-left ===
-  px(x,    y+20, 16, 4, DB);
-  px(x,    y+24, 20, 4, DB);
-  px(x,    y+28, 24, 4, DB);
-  px(x+4,  y+32, 20, 4, DB);
-  px(x+8,  y+36, 16, 4, DB);
+  // === DARK DEPTH (lower-left body) ===
+  px(x,    y+20,   12, 4, DB);
+  px(x,    y+24,   16, 4, DB);
+  px(x+ 4, y+28,   12, 4, DB);
+  px(x+ 8, y+32,    8, 4, DB);
 
-  // === ARC 1 — inner (left side) ===
-  px(x+16, y+ 8+s1,  4, 4, MB);
-  px(x+12, y+12+s1,  4, 4, MB);
-  px(x+ 8, y+16+s1,  4, 4, MB);
-  px(x+ 8, y+20+s1,  4, 4, MB);
-  px(x+ 8, y+24+s1,  4, 4, MB);
+  // === ARC 1 — innermost, follows steep left face ===
+  px(x+ 8, y+ 0+s1, 4, 4, DB);
+  px(x+ 4, y+ 4+s1, 4, 4, DB);
+  px(x+ 4, y+ 8+s1, 4, 4, DB);
+  px(x,    y+12+s1, 4, 4, DB);
+  px(x,    y+16+s1, 4, 4, DB);
+  px(x,    y+20+s1, 4, 4, DB);
 
-  // === ARC 2 — mid ===
-  px(x+28, y+ 4+s2,  4, 4, MB);
-  px(x+24, y+ 8+s2,  4, 4, MB);
-  px(x+20, y+12+s2,  4, 4, MB);
-  px(x+16, y+16+s2,  4, 4, MB);
-  px(x+12, y+20+s2,  4, 4, MB);
-  px(x+12, y+24+s2,  4, 4, MB);
-  px(x+12, y+28+s2,  4, 4, MB);
+  // === ARC 2 ===
+  px(x+16, y+ 0+s2, 4, 4, MB);
+  px(x+12, y+ 4+s2, 4, 4, MB);
+  px(x+ 8, y+ 8+s2, 4, 4, MB);
+  px(x+ 8, y+12+s2, 4, 4, MB);
+  px(x+ 4, y+16+s2, 4, 4, MB);
+  px(x+ 4, y+20+s2, 4, 4, MB);
+  px(x+ 4, y+24+s2, 4, 4, MB);
+  px(x+ 8, y+28+s2, 4, 4, MB);
 
-  // === ARC 3 — outer ===
-  px(x+44, y+ 0+s3,  4, 4, MB);
-  px(x+40, y+ 4+s3,  4, 4, MB);
-  px(x+36, y+ 8+s3,  4, 4, MB);
-  px(x+32, y+12+s3,  4, 4, MB);
-  px(x+28, y+16+s3,  4, 4, MB);
-  px(x+24, y+20+s3,  4, 4, MB);
-  px(x+20, y+24+s3,  4, 4, MB);
-  px(x+16, y+28+s3,  4, 4, MB);
-  px(x+16, y+32+s3,  4, 4, MB);
+  // === ARC 3 ===
+  px(x+28, y+ 0+s3, 4, 4, MB);
+  px(x+24, y+ 4+s3, 4, 4, MB);
+  px(x+20, y+ 8+s3, 4, 4, MB);
+  px(x+16, y+12+s3, 4, 4, MB);
+  px(x+12, y+16+s3, 4, 4, MB);
+  px(x+12, y+20+s3, 4, 4, MB);
+  px(x+12, y+24+s3, 4, 4, MB);
+  px(x+16, y+28+s3, 4, 4, MB);
+  px(x+20, y+32+s3, 4, 4, MB);
+
+  // === ARC 4 — outermost ===
+  px(x+40, y+ 0+s4, 4, 4, MB);
+  px(x+36, y+ 4+s4, 4, 4, MB);
+  px(x+32, y+ 8+s4, 4, 4, MB);
+  px(x+28, y+12+s4, 4, 4, MB);
+  px(x+24, y+16+s4, 4, 4, MB);
+  px(x+20, y+20+s4, 4, 4, MB);
+  px(x+20, y+24+s4, 4, 4, MB);
+  px(x+24, y+28+s4, 4, 4, MB);
+  px(x+28, y+32+s4, 4, 4, MB);
+  px(x+32, y+36+s4, 4, 4, MB);
 
   // === CREST HIGHLIGHT ===
-  px(x+20, y,    16, 4, HI);
-  px(x+28, y+4,   8, 4, HI);
+  px(x+16, y,    12, 4, HI);
+  px(x+ 8, y+ 4,  8, 4, HI);
 
-  // === FOAM SPRAY — top-right, animated opacity ===
+  // === FOAM SPRAY — top-right where crest breaks ===
   ctx.globalAlpha = foamA;
-  px(x+52, y,    8, 4, FM);
-  px(x+56, y+4,  8, 4, FM);
-  px(x+52, y+4,  4, 4, FM);
-  px(x+60, y+8,  4, 4, FM);
+  px(x+56, y,      20, 4, FM);
+  px(x+60, y+ 4,   16, 4, FM);
+  px(x+64, y+ 8,   12, 4, FM);
+  px(x+68, y+12,    8, 4, FM);
+  // scattered foam dots inside barrel
+  px(x+20, y+ 8,    4, 4, FM);
+  px(x+36, y+12,    4, 4, FM);
+  px(x+16, y+20,    4, 4, FM);
+  px(x+32, y+24,    4, 4, FM);
   ctx.globalAlpha = 1;
 
   // +100 LABEL
