@@ -1389,7 +1389,7 @@ function spawnParticles(x, y) {
 
 function spawnBonusWave() {
   const w = 80, h = 27;
-  const vx = (Math.random() < 0.5 ? 1 : -1) * (0.4 + Math.random() * 0.4);
+  const vx = (Math.random() < 0.5 ? 1 : -1) * (0.1 + Math.random() * 0.1);
   bonusWaves.push({
     x: 16 + Math.random() * (GW - 32 - w),
     y: -h - 20, w, h,
@@ -1556,8 +1556,6 @@ function update(dt) {
   bonusWaves = bonusWaves.filter(w => {
     w.y += w.spd * speed * 0.55 * dt;
     w.x += w.vx * speed * 0.55 * dt;
-    if (w.x < -w.w) w.x = GW;
-    if (w.x > GW)   w.x = -w.w;
     if (collides(surfer, w)) {
       score += 100;
       spinFrames = 50;
