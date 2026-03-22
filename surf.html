@@ -111,6 +111,10 @@ nameInput.addEventListener('keydown', e => {
 nameInput.addEventListener('keyup', e => e.stopPropagation());
 nameBtn.addEventListener('click', submitName);
 
+// ---- WAVE BONUS IMAGE ----
+const waveImg = new Image();
+waveImg.src = 'wave_bonus.png';
+
 // ---- AUDIO ----
 let audioCtx = null;
 let masterGain = null;
@@ -1384,7 +1388,7 @@ function spawnParticles(x, y) {
 }
 
 function spawnBonusWave() {
-  const w = 64, h = 40;
+  const w = 80, h = 27;
   bonusWaves.push({
     x: 16 + Math.random() * (GW - 32 - w),
     y: -h - 20, w, h,
@@ -1396,51 +1400,13 @@ function spawnBonusWave() {
 function drawBonusWave(o) {
   const x = Math.floor(o.x);
   const y = Math.floor(o.y);
-  const p = 4;
-  const LB = '#5cb8f0';  // light blue  — outer ring
-  const MB = '#2878d8';  // medium blue — middle ring
-  const DB = '#1050b0';  // dark blue   — inner core
-
-  // DOUBLE-HUMP WAVE (M-shape) — 3 concentric color rings, no border
-  // Two peaks at top with transparent valley, merged base below
-
-  // === LIGHT BLUE — full silhouette ===
-  px(x+p*2,  y,      p*4,  p,  LB);  // row 0: left peak  [2–5]
-  px(x+p*11, y,      p*4,  p,  LB);  // row 0: right peak [11–14]
-  px(x+p,    y+p,    p*6,  p,  LB);  // row 1: left  [1–6]
-  px(x+p*10, y+p,    p*6,  p,  LB);  // row 1: right [10–15]
-  px(x,      y+p*2,  p*8,  p,  LB);  // row 2: left  [0–7]
-  px(x+p*9,  y+p*2,  p*7,  p,  LB);  // row 2: right [9–15]  (1-col gap at col 8)
-  for (let r = 3; r <= 7; r++) px(x,      y+p*r,  p*16, p,  LB);  // rows 3–7: full
-  px(x+p,    y+p*8,  p*14, p,  LB);  // row 8: [1–14]
-  px(x+p*2,  y+p*9,  p*12, p,  LB);  // row 9: [2–13]
-
-  // === MEDIUM BLUE — 1 block inset from silhouette ===
-  px(x+p*3,  y,      p*2,  p,  MB);  // row 0: [3–4]
-  px(x+p*12, y,      p*2,  p,  MB);  // row 0: [12–13]
-  px(x+p*2,  y+p,    p*4,  p,  MB);  // row 1 left:  [2–5]
-  px(x+p*11, y+p,    p*4,  p,  MB);  // row 1 right: [11–14]
-  px(x+p,    y+p*2,  p*6,  p,  MB);  // row 2 left:  [1–6]
-  px(x+p*10, y+p*2,  p*5,  p,  MB);  // row 2 right: [10–14]
-  for (let r = 3; r <= 7; r++) px(x+p,    y+p*r,  p*14, p,  MB);  // rows 3–7: [1–14]
-  px(x+p*2,  y+p*8,  p*12, p,  MB);  // row 8: [2–13]
-  px(x+p*3,  y+p*9,  p*10, p,  MB);  // row 9: [3–12]
-
-  // === DARK BLUE — 2 blocks inset from silhouette ===
-  // row 0: peaks only 4 wide → inset 2 leaves nothing
-  px(x+p*3,  y+p,    p*2,  p,  DB);  // row 1 left:  [3–4]
-  px(x+p*12, y+p,    p*2,  p,  DB);  // row 1 right: [12–13]
-  px(x+p*2,  y+p*2,  p*4,  p,  DB);  // row 2 left:  [2–5]
-  px(x+p*11, y+p*2,  p*3,  p,  DB);  // row 2 right: [11–13]
-  for (let r = 3; r <= 7; r++) px(x+p*2,  y+p*r,  p*12, p,  DB);  // rows 3–7: [2–13]
-  px(x+p*3,  y+p*8,  p*10, p,  DB);  // row 8: [3–12]
-  px(x+p*4,  y+p*9,  p*8,  p,  DB);  // row 9: [4–11]
-
-  // +100 LABEL
+  if (waveImg.complete && waveImg.naturalWidth > 0) {
+    ctx.drawImage(waveImg, x, y, o.w, o.h);
+  }
   ctx.fillStyle = '#ffff00';
   ctx.font = '8px "Press Start 2P"';
   ctx.textAlign = 'center';
-  ctx.fillText('+100', x + p*8, y - p);
+  ctx.fillText('+100', x + o.w / 2, y - 4);
 }
 
 // ---- COLLISION ----
