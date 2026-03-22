@@ -111,10 +111,6 @@ nameInput.addEventListener('keydown', e => {
 nameInput.addEventListener('keyup', e => e.stopPropagation());
 nameBtn.addEventListener('click', submitName);
 
-// ---- WAVE BONUS IMAGE ----
-const waveImg = new Image();
-waveImg.src = 'wave_bonus.png';
-
 // ---- AUDIO ----
 let audioCtx = null;
 let masterGain = null;
@@ -1402,13 +1398,84 @@ function spawnBonusWave() {
 function drawBonusWave(o) {
   const x = Math.floor(o.x);
   const y = Math.floor(o.y);
-  if (waveImg.complete && waveImg.naturalWidth > 0) {
-    ctx.drawImage(waveImg, x, y, o.w, o.h);
-  }
+
+  // Rolling animation — each arc stripe oscillates independently
+  const t  = frame * 0.08 + o.phase;
+  const s1 = Math.round(Math.sin(t)       * 2);
+  const s2 = Math.round(Math.sin(t + 1.2) * 2);
+  const s3 = Math.round(Math.sin(t + 2.4) * 2);
+  const foamA = 0.55 + Math.abs(Math.sin(t * 1.4)) * 0.45;
+
+  const BL = '#3ab4ee';  // bright light blue — main body
+  const MB = '#1a7acc';  // medium blue — arc stripes
+  const DB = '#0e4e96';  // dark blue — depth
+  const HI = '#b8e0f8';  // highlight at crest
+  const FM = '#ffffff';  // foam
+
+  // === BODY — dome, 80×44 ===
+  px(x+20, y,    40, 4, BL);
+  px(x+12, y+4,  56, 4, BL);
+  px(x+4,  y+8,  72, 4, BL);
+  px(x,    y+12, 80, 4, BL);
+  px(x,    y+16, 80, 4, BL);
+  px(x,    y+20, 80, 4, BL);
+  px(x,    y+24, 80, 4, BL);
+  px(x,    y+28, 76, 4, BL);
+  px(x+4,  y+32, 68, 4, BL);
+  px(x+8,  y+36, 56, 4, BL);
+  px(x+16, y+40, 40, 4, BL);
+
+  // === DEPTH — dark lower-left ===
+  px(x,    y+20, 16, 4, DB);
+  px(x,    y+24, 20, 4, DB);
+  px(x,    y+28, 24, 4, DB);
+  px(x+4,  y+32, 20, 4, DB);
+  px(x+8,  y+36, 16, 4, DB);
+
+  // === ARC 1 — inner (left side) ===
+  px(x+16, y+ 8+s1,  4, 4, MB);
+  px(x+12, y+12+s1,  4, 4, MB);
+  px(x+ 8, y+16+s1,  4, 4, MB);
+  px(x+ 8, y+20+s1,  4, 4, MB);
+  px(x+ 8, y+24+s1,  4, 4, MB);
+
+  // === ARC 2 — mid ===
+  px(x+28, y+ 4+s2,  4, 4, MB);
+  px(x+24, y+ 8+s2,  4, 4, MB);
+  px(x+20, y+12+s2,  4, 4, MB);
+  px(x+16, y+16+s2,  4, 4, MB);
+  px(x+12, y+20+s2,  4, 4, MB);
+  px(x+12, y+24+s2,  4, 4, MB);
+  px(x+12, y+28+s2,  4, 4, MB);
+
+  // === ARC 3 — outer ===
+  px(x+44, y+ 0+s3,  4, 4, MB);
+  px(x+40, y+ 4+s3,  4, 4, MB);
+  px(x+36, y+ 8+s3,  4, 4, MB);
+  px(x+32, y+12+s3,  4, 4, MB);
+  px(x+28, y+16+s3,  4, 4, MB);
+  px(x+24, y+20+s3,  4, 4, MB);
+  px(x+20, y+24+s3,  4, 4, MB);
+  px(x+16, y+28+s3,  4, 4, MB);
+  px(x+16, y+32+s3,  4, 4, MB);
+
+  // === CREST HIGHLIGHT ===
+  px(x+20, y,    16, 4, HI);
+  px(x+28, y+4,   8, 4, HI);
+
+  // === FOAM SPRAY — top-right, animated opacity ===
+  ctx.globalAlpha = foamA;
+  px(x+52, y,    8, 4, FM);
+  px(x+56, y+4,  8, 4, FM);
+  px(x+52, y+4,  4, 4, FM);
+  px(x+60, y+8,  4, 4, FM);
+  ctx.globalAlpha = 1;
+
+  // +100 LABEL
   ctx.fillStyle = '#ffff00';
   ctx.font = '8px "Press Start 2P"';
   ctx.textAlign = 'center';
-  ctx.fillText('+100', x + o.w / 2, y - 4);
+  ctx.fillText('+100', x + 40, y - 4);
 }
 
 // ---- COLLISION ----
