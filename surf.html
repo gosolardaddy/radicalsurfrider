@@ -1384,7 +1384,7 @@ function spawnParticles(x, y) {
 }
 
 function spawnBonusWave() {
-  const w = 56, h = 52;
+  const w = 60, h = 44;
   bonusWaves.push({
     x: 16 + Math.random() * (GW - 32 - w),
     y: -h - 20, w, h,
@@ -1398,50 +1398,73 @@ function drawBonusWave(o) {
   const y = Math.floor(o.y);
   const p = 4;
   const BK = '#111111';
-  const LT = '#70c8ce'; // light teal face
-  const MB = '#3090b8'; // medium blue body
-  const DB = '#1a6080'; // dark blue lower
-  const GR = '#6888a0'; // grey barrel shadow
+  const WH = '#dff4f6';  // white foam at curl tip
+  const LT = '#72cacc';  // light teal face
+  const MB = '#2e88b4';  // medium blue
+  const DB = '#1a5e88';  // dark blue base
+  const GR = '#608898';  // grey shadow inside barrel
 
-  // --- BLACK OUTLINE ---
-  // top curl
-  px(x+p*3, y-p*2, p*4, p*2, BK);
-  px(x+p*2, y-p,   p,   p,   BK);
-  px(x+p*7, y-p,   p,   p,   BK);
-  // left wall
-  px(x,     y,     p,   p*7,  BK);
-  // bottom
-  px(x+p,   y+p*7, p*9, p,   BK);
-  // right staircase face
-  px(x+p*9, y+p,   p,   p*2, BK);
-  px(x+p*10,y+p*3, p,   p*2, BK);
-  px(x+p*11,y+p*5, p,   p*2, BK);
+  // C-SHAPED BARREL WAVE
+  // Wide top curl + narrow left wall in middle (barrel open right) + wide base
 
-  // --- LIGHT TEAL — curl + left face ---
-  px(x+p*3, y-p,   p*4, p,   LT); // curl top
-  px(x+p*2, y,     p*6, p*2, LT); // curl body
-  px(x+p,   y+p*2, p*4, p*2, LT); // left face upper
-  px(x+p,   y+p*4, p*2, p*2, LT); // left face lower
+  // === TOP CURL (full width) ===
+  px(x,      y,      p*12, p,   BK); // outline top
+  px(x,      y+p,    p,    p,   BK); // left edge
+  px(x+p,    y+p,    p*3,  p,   WH); // white foam
+  px(x+p*4,  y+p,    p*7,  p,   LT); // light teal curl
+  px(x+p*11, y+p,    p,    p,   BK); // right edge
 
-  // --- MEDIUM BLUE — upper body ---
-  px(x+p*5, y+p*2, p*4, p*2, MB);
-  px(x+p*3, y+p*4, p*6, p*2, MB);
+  // === ROW 2 — face + shadow, right side opens up ===
+  px(x,      y+p*2,  p,    p,   BK);
+  px(x+p,    y+p*2,  p*5,  p,   LT); // face
+  px(x+p*6,  y+p*2,  p*4,  p,   GR); // shadow
+  px(x+p*10, y+p*2,  p,    p,   BK); // staircase edge (cols 11+ open)
 
-  // --- DARK BLUE — lower body ---
-  px(x+p,   y+p*6, p*10, p,  DB);
+  // === ROW 3 — barrel staircase narrows right ===
+  px(x,      y+p*3,  p,    p,   BK);
+  px(x+p,    y+p*3,  p*3,  p,   LT);
+  px(x+p*4,  y+p*3,  p*3,  p,   GR);
+  px(x+p*7,  y+p*3,  p,    p,   BK);
+  // cols 8+ open = barrel mouth
 
-  // --- GREY — barrel shadow staircase ---
-  px(x+p*6, y+p*1, p*2, p,   GR);
-  px(x+p*5, y+p*2, p*2, p,   GR);
-  px(x+p*4, y+p*3, p*2, p,   GR);
-  px(x+p*3, y+p*4, p*2, p,   GR);
-  px(x+p*2, y+p*5, p*2, p,   GR);
+  // === ROW 4 ===
+  px(x,      y+p*4,  p,    p,   BK);
+  px(x+p,    y+p*4,  p*2,  p,   LT);
+  px(x+p*3,  y+p*4,  p*2,  p,   GR);
+  px(x+p*5,  y+p*4,  p,    p,   BK);
+  // cols 6+ open
 
-  // +100 label
+  // === ROW 5 ===
+  px(x,      y+p*5,  p,    p,   BK);
+  px(x+p,    y+p*5,  p*2,  p,   LT);
+  px(x+p*3,  y+p*5,  p,    p,   GR);
+  px(x+p*4,  y+p*5,  p,    p,   BK);
+  // cols 5+ open
+
+  // === ROW 6 ===
+  px(x,      y+p*6,  p,    p,   BK);
+  px(x+p,    y+p*6,  p*2,  p,   MB);
+  px(x+p*3,  y+p*6,  p,    p,   BK);
+  // cols 4+ open
+
+  // === ROW 7 ===
+  px(x,      y+p*7,  p,    p,   BK);
+  px(x+p,    y+p*7,  p*2,  p,   DB);
+  px(x+p*3,  y+p*7,  p,    p,   BK);
+  // cols 4+ open
+
+  // === BASE (full width) ===
+  px(x,      y+p*8,  p*12, p,   BK); // base top outline
+  px(x,      y+p*9,  p,    p,   BK);
+  px(x+p,    y+p*9,  p*10, p,   DB); // base fill
+  px(x+p*11, y+p*9,  p,    p,   BK);
+  px(x,      y+p*10, p*12, p,   BK); // base bottom outline
+
+  // +100 LABEL
   ctx.fillStyle = '#ffff00';
   ctx.font = '8px "Press Start 2P"';
   ctx.textAlign = 'center';
-  ctx.fillText('+100', x + p*5, y - p*3);
+  ctx.fillText('+100', x + p*6, y - p);
 }
 
 // ---- COLLISION ----
