@@ -1422,11 +1422,11 @@ function drawBonusWave(o) {
   px(x,    y+12,   76, 4, BL); // [0–18]
   px(x,    y+16,   80, 4, BL); // full
   px(x,    y+20,   80, 4, BL); // full
-  px(x,    y+24,   80, 4, BL); // full
-  px(x+ 4, y+28,   76, 4, BL); // left steps IN, right stays out
-  px(x+ 8, y+32,   72, 4, BL);
-  px(x+16, y+36,   64, 4, BL); // base thins on left, extends right
-  px(x+24, y+40,   56, 4, BL); // thin tail extends to the right
+  px(x,    y+24,   76, 4, BL); // right starts stepping in
+  px(x+ 4, y+28,   64, 4, BL); // both edges step in
+  px(x+ 8, y+32,   52, 4, BL); // wave break taper
+  px(x+16, y+36,   36, 4, BL); // narrowing
+  px(x+24, y+40,   20, 4, BL); // thin point at bottom-right
 
   // === DARK DEPTH (lower-left body) ===
   px(x,    y+20,   12, 4, DB);
