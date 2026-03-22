@@ -1095,16 +1095,16 @@ function drawUI() {
   // Level indicator (centered top)
   const lCfg = LEVELS[level];
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = endless ? '#ffdd00' : '#ffffff';
   ctx.font = 'bold 11px monospace';
-  ctx.fillText('LVL ' + lCfg.num + '  ' + lCfg.name, GW / 2, 18);
+  ctx.fillText(endless ? 'BONUS SHRED' : 'LVL ' + lCfg.num + '  ' + lCfg.name, GW / 2, 18);
   // Level progress bar
-  const lvlProg = Math.min(levelTimer / lCfg.duration, 1);
+  const lvlProg = endless ? 1 : Math.min(levelTimer / lCfg.duration, 1);
   const lpW = 110;
   const lpX = Math.floor((GW - lpW) / 2);
   ctx.fillStyle = '#333';
   ctx.fillRect(lpX, 22, lpW, 4);
-  ctx.fillStyle = '#ff6600';
+  ctx.fillStyle = endless ? '#ffdd00' : '#ff6600';
   ctx.fillRect(lpX, 22, Math.floor(lpW * lvlProg), 4);
   // bar border
   ctx.fillStyle = '#555';

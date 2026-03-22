@@ -3,39 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Radical Surfrider — Nostalgic 8-Bit Surf Game</title>
-  <meta name="description" content="Dodge sharks, barrels and jellyfish as a punk surfer riding endless waves. Free 8-bit browser game. How far can you shred?">
-  <meta name="keywords" content="surf game, 8 bit game, browser game, endless runner, pixel game, surfing, free game, radical surfrider">
-  <meta name="author" content="Radical Surfrider">
-  <meta name="robots" content="index, follow">
-
-  <!-- Open Graph (social sharing) -->
-  <meta property="og:title" content="Radical Surfrider — Nostalgic 8-Bit Surf Game">
-  <meta property="og:description" content="Dodge sharks, barrels and jellyfish as a punk surfer riding endless waves. Free 8-bit browser game. How far can you shred?">
-  <meta property="og:url" content="https://radicalsurfrider.com">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Radical Surfrider">
-  <meta property="og:image" content="https://radicalsurfrider.com/cover.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-
-  <!-- Twitter/X card -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Radical Surfrider — Nostalgic 8-Bit Surf Game">
-  <meta name="twitter:description" content="Dodge sharks, barrels and jellyfish as a punk surfer riding endless waves. Free 8-bit browser game. How far can you shred?">
-  <meta name="twitter:image" content="https://radicalsurfrider.com/cover.jpg">
-
+  <title>Radical Surfrider</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E1S00S4YR3"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-E1S00S4YR3');
-  </script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5064923561295520" crossorigin="anonymous"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; background: #000; overflow: hidden; }
@@ -1125,16 +1095,16 @@ function drawUI() {
   // Level indicator (centered top)
   const lCfg = LEVELS[level];
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = endless ? '#ffdd00' : '#ffffff';
   ctx.font = 'bold 11px monospace';
-  ctx.fillText('LVL ' + lCfg.num + '  ' + lCfg.name, GW / 2, 18);
+  ctx.fillText(endless ? 'BONUS SHRED' : 'LVL ' + lCfg.num + '  ' + lCfg.name, GW / 2, 18);
   // Level progress bar
-  const lvlProg = Math.min(levelTimer / lCfg.duration, 1);
+  const lvlProg = endless ? 1 : Math.min(levelTimer / lCfg.duration, 1);
   const lpW = 110;
   const lpX = Math.floor((GW - lpW) / 2);
   ctx.fillStyle = '#333';
   ctx.fillRect(lpX, 22, lpW, 4);
-  ctx.fillStyle = '#ff6600';
+  ctx.fillStyle = endless ? '#ffdd00' : '#ff6600';
   ctx.fillRect(lpX, 22, Math.floor(lpW * lvlProg), 4);
   // bar border
   ctx.fillStyle = '#555';
