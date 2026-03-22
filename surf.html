@@ -1384,7 +1384,7 @@ function spawnParticles(x, y) {
 }
 
 function spawnBonusWave() {
-  const w = 64, h = 40;
+  const w = 60, h = 45;
   bonusWaves.push({
     x: 16 + Math.random() * (GW - 32 - w),
     y: -h - 20, w, h,
@@ -1396,31 +1396,36 @@ function spawnBonusWave() {
 function drawBonusWave(o) {
   const x = Math.floor(o.x);
   const y = Math.floor(o.y);
-  const foam = Math.sin(frame * 0.18 + o.phase) > 0 ? '#ffffff' : '#ddf4ff';
-  // Wave body — rolling curl shape
-  const body = [
-    [0,20,64,20,'#0077cc'],
-    [4,14,56,8, '#0099ee'],
-    [8,8, 48,8, '#22aaff'],
-    [12,4,36,6, '#55ccff'],
-    // curl lip
-    [10,2,18,4, '#88ddff'],
-    [28,0,14,4, '#aaeeff'],
-    // foam top
-    [8,0, 10,3, foam],
-    [22,0,8, 2, foam],
-    [34,0,10,3, foam],
-    // white water base
-    [0,36,16,4, '#aaddff'],
-    [20,34,10,4,'#aaddff'],
-    [36,36,14,4,'#aaddff'],
+  const p = 5; // pixel block size
+  // Colors
+  const D1 = '#0d4f72'; // darkest base
+  const D2 = '#1a7aaa'; // dark body
+  const MB = '#3aafd4'; // medium blue
+  const LB = '#7dd4ea'; // light blue
+  const FM = '#b8e8f4'; // foam
+  const WH = '#e4f6fc'; // white crest
+  // Staircase wave shape — each row: [x offset, width, color]
+  const rows = [
+    [p*3, p*7, WH],   // row 0 — white crest top
+    [p*2, p*9, FM],   // row 1 — foam
+    [p*1, p*10, LB],  // row 2 — light blue
+    [0,   p*11, MB],  // row 3 — medium blue
+    [0,   p*11, MB],  // row 4
+    [0,   p*10, D2],  // row 5 — dark, right side drops
+    [0,   p*9,  D2],  // row 6
+    [0,   p*8,  D1],  // row 7
+    [0,   p*7,  D1],  // row 8 — base
   ];
-  body.forEach(([rx,ry,rw,rh,c]) => px(x+rx, y+ry, rw, rh, c));
-  // Bonus star indicator above wave
+  rows.forEach(([rx, rw, c], i) => px(x + rx, y + i * p, rw, p, c));
+  // Spray pixels scattered around crest
+  px(x + p*11, y,      p, p, FM);
+  px(x + p*12, y - p,  p, p, WH);
+  px(x + p*1,  y + p,  p, p, LB);
+  // +100 label
   ctx.fillStyle = '#ffff00';
   ctx.font = '8px "Press Start 2P"';
   ctx.textAlign = 'center';
-  ctx.fillText('+100', x + 32, y - 4);
+  ctx.fillText('+100', x + p*5, y - 4);
 }
 
 // ---- COLLISION ----
