@@ -329,6 +329,7 @@ let spawnInterval = 100;
 let shakeFrames = 0;
 let cheerFrames = 0;
 let spinFrames = 0;
+let trickType  = 1; // 1=360spin 2=boardflip 3=handstand
 let bonusWaves = [];
 let lastCheerMilestone = 0;
 let lastBigCheer = 0;
@@ -475,6 +476,7 @@ function startGame() {
   pendingSpawns = [];
   cheerFrames = 0;
   spinFrames = 0;
+  trickType  = 1;
   lastCheerMilestone = 0;
   lastBigCheer = 0;
   cheerPopups = [];
@@ -1646,6 +1648,7 @@ function update(dt) {
     w.x += w.vx * speed * 0.55 * dt;
     if (collides(surfer, w)) {
       score += 100;
+      trickType  = Math.floor(Math.random() * 3) + 1;
       spinFrames = 50;
       cheerFrames = 80;
       sfxCheer();
@@ -1744,11 +1747,29 @@ function draw() {
     return dx < 60 && dy > -20 && dy < 80;
   });
   if (spinFrames > 0) {
-    const spinAngle = ((50 - spinFrames) / 50) * Math.PI * 2;
+    const prog = (50 - spinFrames) / 50; // 0 → 1 over trick duration
     ctx.save();
     ctx.translate(surfer.x, surfer.y + bob);
-    ctx.rotate(spinAngle);
-    drawSurfer(0, 0, false);
+
+    if (trickType === 1) {
+      // 360 spin — full rotation
+      ctx.rotate(prog * Math.PI * 2);
+      drawSurfer(0, 0, false);
+
+    } else if (trickType === 2) {
+      // Board flip — board swings horizontal and back (scaleX oscillates)
+      ctx.scale(Math.cos(prog * Math.PI * 2), 1);
+      drawSurfer(0, 0, false);
+
+    } else {
+      // Handstand — quickly flip upside down, hold, then right back up
+      const scaleY = prog < 0.25 ? 1 - prog * 8        // flip down fast
+                   : prog > 0.75 ? -1 + (prog - 0.75) * 8 // right back up
+                   : -1;                                // hold upside down
+      ctx.scale(1, scaleY);
+      drawSurfer(0, 0, false);
+    }
+
     ctx.restore();
   } else {
     drawSurfer(surfer.x, surfer.y + bob, scared);
