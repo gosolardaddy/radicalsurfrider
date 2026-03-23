@@ -1388,13 +1388,13 @@ function spawnParticles(x, y) {
 }
 
 function spawnBonusWave() {
-  const w = 80, h = 44;
-  const vx = (Math.random() < 0.5 ? 1 : -1) * (0.1 + Math.random() * 0.1);
+  const w = 160, h = 28;
+  const pts = [500, 750, 1000][Math.floor(Math.random() * 3)];
   bonusWaves.push({
     x: 16 + Math.random() * (GW - 32 - w),
-    y: -h - 20, w, h,
+    y: Math.floor(GH * 0.26), w, h,
     spd: 0.7 + Math.random() * 0.4,
-    vx,
+    pts,
     phase: Math.random() * Math.PI * 2
   });
 }
@@ -1417,111 +1417,103 @@ function drawBonusWave(o) {
   const HI = '#b8e0f8';  // crest highlight
   const FM = '#ffffff';  // foam
 
-  // === WAVE BODY — asymmetric wave shape ===
-  // Steep vertical face on LEFT, crest at top, base extends RIGHT
-  // (left edge steps IN at bottom, right edge stays WIDE = base/tail)
-  px(x+16, y,      40, 4, BL); // crest  [cols 4–13]
-  px(x+ 8, y+ 4,   60, 4, BL); // [2–16]
-  px(x+ 4, y+ 8,   72, 4, BL); // [1–18]
-  px(x,    y+12,   76, 4, BL); // [0–18]
-  px(x,    y+16,   80, 4, BL); // full
-  px(x,    y+20,   80, 4, BL); // full
-  px(x,    y+24,   76, 4, BL); // right starts stepping in
-  px(x+ 4, y+28,   64, 4, BL); // both edges step in
-  px(x+ 8, y+32,   52, 4, BL); // wave break taper
-  px(x+16, y+36,   36, 4, BL); // narrowing
-  px(x+24, y+40,   20, 4, BL); // thin point at bottom-right
+  // === WAVE BODY — 160px wide, 28px tall, asymmetric ===
+  px(x+32, y,      80, 4, BL); // crest — narrow at top
+  px(x+16, y+ 4,  120, 4, BL);
+  px(x+ 8, y+ 8,  144, 4, BL);
+  px(x,    y+12,  152, 4, BL);
+  px(x,    y+16,  160, 4, BL); // full width
+  px(x,    y+20,  148, 4, BL); // right starts tapering
+  px(x+ 8, y+24,  124, 4, BL); // wave break taper
 
   // === DARK DEPTH (lower-left body) ===
-  px(x,    y+20,   12, 4, DB);
-  px(x,    y+24,   16, 4, DB);
-  px(x+ 4, y+28,   12, 4, DB);
-  px(x+ 8, y+32,    8, 4, DB);
+  px(x,    y+16,   24, 4, DB);
+  px(x,    y+20,   28, 4, DB);
+  px(x+ 8, y+24,   20, 4, DB);
 
   // === ARC 1 — innermost, follows steep left face ===
-  px(x+ 8, y+ 0+s1, 4, 4, DB);
-  px(x+ 4, y+ 4+s1, 4, 4, DB);
-  px(x+ 4, y+ 8+s1, 4, 4, DB);
+  px(x+16, y+ 0+s1, 4, 4, DB);
+  px(x+ 8, y+ 4+s1, 4, 4, DB);
+  px(x+ 8, y+ 8+s1, 4, 4, DB);
   px(x,    y+12+s1, 4, 4, DB);
   px(x,    y+16+s1, 4, 4, DB);
   px(x,    y+20+s1, 4, 4, DB);
 
   // === ARC 2 ===
-  px(x+16, y+ 0+s2, 4, 4, MB);
-  px(x+12, y+ 4+s2, 4, 4, MB);
-  px(x+ 8, y+ 8+s2, 4, 4, MB);
-  px(x+ 8, y+12+s2, 4, 4, MB);
-  px(x+ 4, y+16+s2, 4, 4, MB);
-  px(x+ 4, y+20+s2, 4, 4, MB);
-  px(x+ 4, y+24+s2, 4, 4, MB);
-  px(x+ 8, y+28+s2, 4, 4, MB);
+  px(x+32, y+ 0+s2, 4, 4, MB);
+  px(x+24, y+ 4+s2, 4, 4, MB);
+  px(x+16, y+ 8+s2, 4, 4, MB);
+  px(x+16, y+12+s2, 4, 4, MB);
+  px(x+ 8, y+16+s2, 4, 4, MB);
+  px(x+ 8, y+20+s2, 4, 4, MB);
+  px(x+16, y+24+s2, 4, 4, MB);
 
   // === ARC 3 ===
-  px(x+28, y+ 0+s3, 4, 4, MB);
-  px(x+24, y+ 4+s3, 4, 4, MB);
-  px(x+20, y+ 8+s3, 4, 4, MB);
-  px(x+16, y+12+s3, 4, 4, MB);
-  px(x+12, y+16+s3, 4, 4, MB);
-  px(x+12, y+20+s3, 4, 4, MB);
-  px(x+12, y+24+s3, 4, 4, MB);
-  px(x+16, y+28+s3, 4, 4, MB);
-  px(x+20, y+32+s3, 4, 4, MB);
+  px(x+56, y+ 0+s3, 4, 4, MB);
+  px(x+48, y+ 4+s3, 4, 4, MB);
+  px(x+40, y+ 8+s3, 4, 4, MB);
+  px(x+32, y+12+s3, 4, 4, MB);
+  px(x+24, y+16+s3, 4, 4, MB);
+  px(x+24, y+20+s3, 4, 4, MB);
+  px(x+32, y+24+s3, 4, 4, MB);
 
   // === ARC 4 — outermost ===
-  px(x+40, y+ 0+s4, 4, 4, MB);
-  px(x+36, y+ 4+s4, 4, 4, MB);
-  px(x+32, y+ 8+s4, 4, 4, MB);
-  px(x+28, y+12+s4, 4, 4, MB);
-  px(x+24, y+16+s4, 4, 4, MB);
-  px(x+20, y+20+s4, 4, 4, MB);
-  px(x+20, y+24+s4, 4, 4, MB);
-  px(x+24, y+28+s4, 4, 4, MB);
-  px(x+28, y+32+s4, 4, 4, MB);
-  px(x+32, y+36+s4, 4, 4, MB);
+  px(x+80, y+ 0+s4, 4, 4, MB);
+  px(x+72, y+ 4+s4, 4, 4, MB);
+  px(x+64, y+ 8+s4, 4, 4, MB);
+  px(x+56, y+12+s4, 4, 4, MB);
+  px(x+48, y+16+s4, 4, 4, MB);
+  px(x+48, y+20+s4, 4, 4, MB);
+  px(x+56, y+24+s4, 4, 4, MB);
 
   // === CREST HIGHLIGHT ===
-  px(x+16, y,    12, 4, HI);
-  px(x+ 8, y+ 4,  8, 4, HI);
+  px(x+32, y,    24, 4, HI);
+  px(x+16, y+ 4, 16, 4, HI);
 
-  // === WHITE SUDS — foamy strip across top of wave ===
-  // Row 1: chunky foam patches across crest
-  px(x+16, y,   8, 4, FM);
-  px(x+28, y,   8, 4, FM);
-  px(x+40, y,   8, 4, FM);
-  px(x+52, y,   4, 4, FM);
-  // Row 2: wider, fills gaps
-  px(x+ 8, y+4,  8, 4, FM);
-  px(x+20, y+4, 12, 4, FM);
-  px(x+36, y+4, 12, 4, FM);
-  px(x+52, y+4,  8, 4, FM);
-  px(x+64, y+4,  4, 4, FM);
-  // Row 3: fades out
+  // === WHITE SUDS — chunky foam patches across full top ===
+  px(x+32, y,   8, 4, FM);
+  px(x+48, y,  10, 4, FM);
+  px(x+64, y,   8, 4, FM);
+  px(x+80, y,  10, 4, FM);
+  px(x+96, y,   8, 4, FM);
+  px(x+108,y,   8, 4, FM);
+  // Row 2 — wider, fills gaps
+  px(x+16, y+4,  8, 4, FM);
+  px(x+32, y+4, 12, 4, FM);
+  px(x+52, y+4, 12, 4, FM);
+  px(x+72, y+4, 10, 4, FM);
+  px(x+92, y+4, 12, 4, FM);
+  px(x+112,y+4,  8, 4, FM);
+  px(x+128,y+4,  4, 4, FM);
+  // Row 3 — fades out
   ctx.globalAlpha = 0.55;
-  px(x+ 4, y+8,  8, 4, FM);
-  px(x+16, y+8,  8, 4, FM);
-  px(x+32, y+8,  8, 4, FM);
-  px(x+48, y+8,  8, 4, FM);
-  px(x+60, y+8,  8, 4, FM);
+  px(x+ 8, y+8,  8, 4, FM);
+  px(x+24, y+8, 10, 4, FM);
+  px(x+44, y+8,  8, 4, FM);
+  px(x+64, y+8, 10, 4, FM);
+  px(x+84, y+8,  8, 4, FM);
+  px(x+104,y+8,  8, 4, FM);
+  px(x+120,y+8,  8, 4, FM);
   ctx.globalAlpha = 1;
 
   // === FOAM SPRAY — top-right where crest breaks ===
   ctx.globalAlpha = foamA;
-  px(x+56, y,      20, 4, FM);
-  px(x+60, y+ 4,   16, 4, FM);
-  px(x+64, y+ 8,   12, 4, FM);
-  px(x+68, y+12,    8, 4, FM);
+  px(x+112, y,      24, 4, FM);
+  px(x+120, y+ 4,   20, 4, FM);
+  px(x+128, y+ 8,   16, 4, FM);
+  px(x+136, y+12,   12, 4, FM);
   // scattered foam dots inside barrel
-  px(x+20, y+ 8,    4, 4, FM);
-  px(x+36, y+12,    4, 4, FM);
-  px(x+16, y+20,    4, 4, FM);
-  px(x+32, y+24,    4, 4, FM);
+  px(x+40,  y+ 8,    4, 4, FM);
+  px(x+72,  y+12,    4, 4, FM);
+  px(x+32,  y+16,    4, 4, FM);
+  px(x+64,  y+20,    4, 4, FM);
   ctx.globalAlpha = 1;
 
   // +100 LABEL
   ctx.fillStyle = '#ffff00';
   ctx.font = '8px "Press Start 2P"';
   ctx.textAlign = 'center';
-  ctx.fillText('+100', x + 40, y - 4);
+  ctx.fillText('+' + o.pts, x + 80, y - 4);
 }
 
 // ---- COLLISION ----
@@ -1667,10 +1659,9 @@ function update(dt) {
 
   // ---- BONUS WAVES ----
   bonusWaves = bonusWaves.filter(w => {
-    w.y += w.spd * speed * 0.55 * dt;
-    w.x += w.vx * speed * 0.55 * dt;
+    w.y += w.spd * speed * 0.3 * dt;
     if (collides(surfer, w)) {
-      score += 100;
+      score += w.pts;
       const trickOrder = [1, 3, 2];
       trickType  = trickOrder[trickIndex % 3];
       trickIndex++;
