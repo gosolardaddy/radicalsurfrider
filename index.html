@@ -64,12 +64,12 @@ function saveLB(lb) {
   lbCache = lb;
   fetch(DB_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lb) }).catch(() => {});
 }
-function qualifies(s) { return lbCache.length < 5 || s > (lbCache[lbCache.length - 1]?.score || 0); }
+function qualifies(s) { return lbCache.length < 8 || s > (lbCache[lbCache.length - 1]?.score || 0); }
 function addScore(name, s) {
   const lb = [...lbCache];
   lb.push({ name: name.toUpperCase().substring(0, 12), score: Math.floor(s) });
   lb.sort((a,b) => b.score - a.score);
-  if (lb.length > 5) lb.length = 5;
+  if (lb.length > 8) lb.length = 8;
   saveLB(lb);
 }
 fetchLB(); // load on page start
@@ -335,6 +335,9 @@ let bonusWaves = [];
 let jetskis = [];
 let jetskiTimer = 0;
 let jetskiInterval = 900 + Math.random() * 600;
+let titleBoat = null;
+let titleBoatTimer = 0;
+let titleBoatDir = 1;
 let lastCheerMilestone = 0;
 let lastBigCheer = 0;
 let cheerPopups = [];
@@ -356,7 +359,7 @@ const BEACH_Y = GH - 85;
 // x = horizontal pos, dy = depth into beach from BEACH_Y (higher = further from water)
 const crowd = [
   // === shown at level 0 (4 people — sparse, spread across beach) ===
-  { x:  52, dy: 12, skin: '#ffcc99', top: '#ff4444', bot: '#ffff44', hair: '#ffd700', type: 0, flag: true,  female: false },
+  { x:  52, dy: 12, skin: '#ffcc99', top: '#ffffff', bot: '#ffffff', hair: '#ffd700', type: 0, flag: true,  female: false, mustache: '#f0c040', pants: '#ff6600' },
   { x: 100, dy: 20, skin: '#c8803a', top: '#ff88cc', bot: '#ff44aa', hair: '#222222', type: 1, flag: false, female: true  },
   { x: 205, dy: 14, skin: '#f0b060', top: '#44ff88', bot: '#ffffff', hair: '#aa4400', type: 2, flag: false, female: false },
   { x: 305, dy: 18, skin: '#8b5a2b', top: '#4488ff', bot: '#ffff00', hair: '#333333', type: 1, flag: false, female: false },
@@ -892,8 +895,8 @@ function drawCrowdPerson(cx, py, p, cheering, jumpOff) {
     px(cx + 3, py + 1 - jy + ptail, 2, 6, p.hair);
   } else {
     // ---- MALE ----
-    px(cx - 3, py + 12 - jy, 3, 8, '#2255aa');
-    px(cx + 1, py + 12 - jy, 3, 8, '#2255aa');
+    px(cx - 3, py + 12 - jy, 3, 8, p.pants || '#2255aa');
+    px(cx + 1, py + 12 - jy, 3, 8, p.pants || '#2255aa');
     px(cx - 4, py + 19 - jy, 4, 2, '#222');
     px(cx + 1, py + 19 - jy, 4, 2, '#222');
     px(cx - 4, py + 4 - jy,  9, 9, p.top);
@@ -926,6 +929,7 @@ function drawCrowdPerson(cx, py, p, cheering, jumpOff) {
   // face — shared
   px(cx - 2, py - 3 - jy, 1, 1, '#333');
   px(cx + 2, py - 3 - jy, 1, 1, '#333');
+  if (p.mustache) px(cx - 2, py - 2 - jy, 5, 1, p.mustache);
   if (cheering) {
     px(cx - 1, py - 1 - jy, 3, 1, '#cc4400');
     px(cx,     py - 1 - jy, 1, 2, '#cc4400');
@@ -1202,18 +1206,17 @@ function drawLeaderboard(centerX, startY) {
     ctx.fillText('NO SCORES YET', centerX, startY + 18);
     return;
   }
-  const medals = ['#ffd700','#cccccc','#cd7f32','#88aaff','#88aaff'];
+  const medals = ['#ffd700','#cccccc','#cd7f32','#88aaff','#88aaff','#aaaaaa','#aaaaaa','#aaaaaa','#aaaaaa','#aaaaaa'];
+  const ranks  = ['1ST','2ND','3RD','4TH','5TH','6TH','7TH','8TH'];
   lb.forEach((e, i) => {
-    ctx.fillStyle = medals[i];
+    ctx.fillStyle = medals[i] || '#aaaaaa';
     ctx.font = "7px 'Press Start 2P', monospace";
-    const rank = ['1ST','2ND','3RD','4TH','5TH'][i];
-    // draw rank left, name center-left, score right
     ctx.textAlign = 'left';
-    ctx.fillText(rank, centerX - 90, startY + 18 + i * 17);
+    ctx.fillText(ranks[i], centerX - 90, startY + 18 + i * 14);
     ctx.textAlign = 'center';
-    ctx.fillText(e.name, centerX, startY + 18 + i * 17);
+    ctx.fillText(e.name, centerX, startY + 18 + i * 14);
     ctx.textAlign = 'right';
-    ctx.fillText(e.score, centerX + 90, startY + 18 + i * 17);
+    ctx.fillText(e.score, centerX + 90, startY + 18 + i * 14);
   });
   ctx.textAlign = 'left';
 }
@@ -1307,21 +1310,45 @@ function drawWin() {
 
 function drawTitle() {
   drawOcean();
+
+  // Speedboat — update position (draw after leaderboard so she's fully visible)
+  if (titleBoat) {
+    titleBoat.x += titleBoat.vx;
+    titleBoat.y += titleBoat.vy;
+    if (titleBoat.x > GW + 80 || titleBoat.x < -80) {
+      titleBoatDir = -titleBoatDir;
+      titleBoat = null;
+      titleBoatTimer = 0;
+    }
+  } else {
+    titleBoatTimer++;
+    if (titleBoatTimer >= 240) {
+      titleBoat = {
+        x:   titleBoatDir === 1 ? -70 : GW + 70,
+        y:   GH * 0.88,
+        vx:  titleBoatDir * 6,
+        vy:  titleBoatDir * 0.4,
+        dir: titleBoatDir
+      };
+      titleBoatTimer = 0;
+    }
+  }
+
   const bob = Math.sin(frame * 0.05) * 4;
   drawSurfer(GW / 2, GH * 0.28 + bob, false);
   drawScanlines();
 
   const panelY = GH * 0.35;
 
-  // Title panel
+  // Title panel (shortened)
   ctx.fillStyle = 'rgba(0,0,0,0.82)';
-  ctx.fillRect(18, panelY, GW - 36, 268);
+  ctx.fillRect(18, panelY, GW - 36, 218);
   ctx.strokeStyle = '#00ff44';
   ctx.lineWidth = 2;
-  ctx.strokeRect(18, panelY, GW - 36, 268);
+  ctx.strokeRect(18, panelY, GW - 36, 218);
   ctx.strokeStyle = '#ff6600';
   ctx.lineWidth = 1;
-  ctx.strokeRect(22, panelY + 4, GW - 44, 260);
+  ctx.strokeRect(22, panelY + 4, GW - 44, 210);
 
   ctx.textAlign = 'center';
 
@@ -1329,13 +1356,10 @@ function drawTitle() {
   function draw3D(text, cx, cy, size, colorTop, colorBot, shadowCol) {
     const off = Math.max(3, Math.floor(size / 9));
     ctx.font = `${size}px 'Press Start 2P', monospace`;
-    // shadow layer (offset down-right)
     ctx.fillStyle = shadowCol;
     ctx.fillText(text, cx + off, cy + off);
-    // highlight layer (offset up-left, subtle)
     ctx.fillStyle = 'rgba(255,255,255,0.18)';
     ctx.fillText(text, cx - 1, cy - 1);
-    // main text with vertical gradient
     const grad = ctx.createLinearGradient(0, cy - size, 0, cy + 4);
     grad.addColorStop(0, colorTop);
     grad.addColorStop(1, colorBot);
@@ -1344,37 +1368,34 @@ function drawTitle() {
   }
 
   // RADICAL
-  draw3D('RADICAL',   GW / 2, panelY + 66,  30, '#ffee00', '#ff8800', '#7a1100');
+  draw3D('RADICAL',   GW / 2, panelY + 60,  30, '#ffee00', '#ff8800', '#7a1100');
   // SURFRIDER
-  draw3D('SURFRIDER', GW / 2, panelY + 114, 26, '#ff9900', '#ff2200', '#550000');
+  draw3D('SURFRIDER', GW / 2, panelY + 104, 26, '#ff9900', '#ff2200', '#550000');
 
   // Subtitle
   ctx.fillStyle = '#00ff44';
   ctx.font = "9px 'Press Start 2P', monospace";
-  ctx.fillText('~ AN 8-BIT SURF ODYSSEY ~', GW / 2, panelY + 142);
+  ctx.fillText('~ AN 8-BIT SURF ODYSSEY ~', GW / 2, panelY + 130);
 
   // Instructions
   ctx.fillStyle = '#999999';
   ctx.font = "8px 'Press Start 2P', monospace";
-  ctx.fillText('DRAG LEFT OR RIGHT', GW / 2, panelY + 180);
-  ctx.fillText('TO DODGE OBSTACLES', GW / 2, panelY + 202);
+  ctx.fillText('DRAG LEFT OR RIGHT TO DODGE', GW / 2, panelY + 162);
 
   // Blinking start prompt
   if (Math.floor(frame / 28) % 2 === 0) {
     ctx.fillStyle = '#ff6600';
     ctx.font = "10px 'Press Start 2P', monospace";
-    ctx.fillText('>> TAP TO START <<', GW / 2, panelY + 248);
+    ctx.fillText('>> TAP TO START <<', GW / 2, panelY + 200);
   }
 
-  // Photosensitivity warning below panel
-  ctx.fillStyle = 'rgba(255,255,255,0.45)';
-  ctx.font = "6px 'Press Start 2P', monospace";
-  ctx.fillText('PHOTOSENSITIVITY WARNING: contains flashing lights', GW / 2, panelY + 280);
-
-  // Leaderboard below warning
-  ctx.globalAlpha = 0.85;
-  drawLeaderboard(GW / 2, panelY + 298);
+  // Leaderboard — pulled up below shortened box
+  ctx.globalAlpha = 0.9;
+  drawLeaderboard(GW / 2, panelY + 232);
   ctx.globalAlpha = 1;
+
+  // Speedboat drawn last so she's on top of everything
+  if (titleBoat) drawJetski(titleBoat);
 
   ctx.textAlign = 'left';
 }
@@ -1506,14 +1527,22 @@ function drawJetski(o) {
   px(-18, 13, 10, 2, '#ffffff');
   ctx.globalAlpha = 1;
 
-  // === YELLOW SPEEDBOAT HULL ===
-  px(  0,  7, 48, 5, '#ffdd00');  // main hull
-  px(  0,  9, 50, 4, '#ccaa00');  // hull underside
-  px(  4,  3, 38, 5, '#ffee55');  // upper deck
-  px( 40,  5,  8, 4, '#ffcc00');  // nose taper
-  px( 46,  7,  4, 2, '#ffaa00');  // nose tip
-  px(  0,  5,  5, 5, '#ddbb00');  // stern detail
-  px(  0,  9,  7, 2, '#886600');  // engine block
+  // === SPEEDBOAT HULL (yellow lvl 1-3, purple lvl 4-5) ===
+  const purple = level >= 3;
+  const hMain  = purple ? '#9944cc' : '#ffdd00';
+  const hUnder = purple ? '#772299' : '#ccaa00';
+  const hDeck  = purple ? '#bb55ee' : '#ffee55';
+  const hNose  = purple ? '#8833bb' : '#ffcc00';
+  const hTip   = purple ? '#6622aa' : '#ffaa00';
+  const hStern = purple ? '#aa44dd' : '#ddbb00';
+  const hEng   = purple ? '#442255' : '#886600';
+  px(  0,  7, 48, 5, hMain);
+  px(  0,  9, 50, 4, hUnder);
+  px(  4,  3, 38, 5, hDeck);
+  px( 40,  5,  8, 4, hNose);
+  px( 46,  7,  4, 2, hTip);
+  px(  0,  5,  5, 5, hStern);
+  px(  0,  9,  7, 2, hEng);
 
   // === WINDSHIELD ===
   px(  8,  0, 12, 5, '#88ccff');
