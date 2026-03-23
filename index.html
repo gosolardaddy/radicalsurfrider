@@ -1483,6 +1483,27 @@ function drawBonusWave(o) {
   px(x+16, y,    12, 4, HI);
   px(x+ 8, y+ 4,  8, 4, HI);
 
+  // === WHITE SUDS — foamy strip across top of wave ===
+  // Row 1: chunky foam patches across crest
+  px(x+16, y,   8, 4, FM);
+  px(x+28, y,   8, 4, FM);
+  px(x+40, y,   8, 4, FM);
+  px(x+52, y,   4, 4, FM);
+  // Row 2: wider, fills gaps
+  px(x+ 8, y+4,  8, 4, FM);
+  px(x+20, y+4, 12, 4, FM);
+  px(x+36, y+4, 12, 4, FM);
+  px(x+52, y+4,  8, 4, FM);
+  px(x+64, y+4,  4, 4, FM);
+  // Row 3: fades out
+  ctx.globalAlpha = 0.55;
+  px(x+ 4, y+8,  8, 4, FM);
+  px(x+16, y+8,  8, 4, FM);
+  px(x+32, y+8,  8, 4, FM);
+  px(x+48, y+8,  8, 4, FM);
+  px(x+60, y+8,  8, 4, FM);
+  ctx.globalAlpha = 1;
+
   // === FOAM SPRAY — top-right where crest breaks ===
   ctx.globalAlpha = foamA;
   px(x+56, y,      20, 4, FM);
