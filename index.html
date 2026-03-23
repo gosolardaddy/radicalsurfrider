@@ -352,24 +352,33 @@ const BEACH_Y = GH - 85;
 // Crowd in clusters of 3-4 across the beach.
 // x = horizontal pos, dy = depth into beach from BEACH_Y (higher = further from water)
 const crowd = [
-  // cluster 1 — far left (3 people)
-  { x: 8,   dy: 10, top: '#ff4444', bot: '#ffff44', hair: '#ffd700', type: 0, flag: true,  female: false },
-  { x: 26,  dy: 28, top: '#ff88cc', bot: '#ff44aa', hair: '#ff8800', type: 1, flag: false, female: true  },
-  { x: 14,  dy: 48, top: '#44ff88', bot: '#ffffff', hair: '#333333', type: 2, flag: false, female: false },
-  // cluster 2 — center-left (4 people)
-  { x: 88,  dy: 8,  top: '#ff66bb', bot: '#ff2288', hair: '#ffd700', type: 0, flag: false, female: true  },
-  { x: 106, dy: 22, top: '#ff44ff', bot: '#ffff00', hair: '#aa4400', type: 1, flag: true,  female: false },
-  { x: 76,  dy: 30, top: '#ff99cc', bot: '#ff44cc', hair: '#222222', type: 2, flag: false, female: true  },
-  { x: 96,  dy: 46, top: '#ffff44', bot: '#4444ff', hair: '#884400', type: 0, flag: false, female: false },
-  // cluster 3 — center-right (3 people)
-  { x: 188, dy: 12, top: '#ff77bb', bot: '#ff1177', hair: '#ffd700', type: 1, flag: false, female: true  },
-  { x: 172, dy: 30, top: '#ff4488', bot: '#44ff44', hair: '#333333', type: 2, flag: false, female: false },
-  { x: 202, dy: 44, top: '#ee88ff', bot: '#cc44ff', hair: '#ff6600', type: 0, flag: true,  female: true  },
-  // cluster 4 — far right (4 people)
-  { x: 290, dy: 10, top: '#4488ff', bot: '#ffff00', hair: '#222222', type: 1, flag: false, female: false },
-  { x: 310, dy: 26, top: '#ff9988', bot: '#ff5544', hair: '#ffd700', type: 2, flag: false, female: true  },
-  { x: 278, dy: 38, top: '#44ccff', bot: '#ff4444', hair: '#aa4400', type: 0, flag: false, female: false },
-  { x: 300, dy: 52, top: '#ffcc44', bot: '#ff6600', hair: '#ffd700', type: 1, flag: true,  female: true  },
+  // === shown at level 0 (4 people — sparse, spread across beach) ===
+  { x:  18, dy: 12, skin: '#ffcc99', top: '#ff4444', bot: '#ffff44', hair: '#ffd700', type: 0, flag: true,  female: false },
+  { x: 100, dy: 20, skin: '#c8803a', top: '#ff88cc', bot: '#ff44aa', hair: '#222222', type: 1, flag: false, female: true  },
+  { x: 205, dy: 14, skin: '#f0b060', top: '#44ff88', bot: '#ffffff', hair: '#aa4400', type: 2, flag: false, female: false },
+  { x: 305, dy: 18, skin: '#8b5a2b', top: '#4488ff', bot: '#ffff00', hair: '#333333', type: 1, flag: false, female: false },
+  // === shown at level 1 (8 people) ===
+  { x:  55, dy: 32, skin: '#5c3317', top: '#ff66bb', bot: '#ff2288', hair: '#333333', type: 0, flag: false, female: true  },
+  { x: 148, dy: 25, skin: '#ffcc99', top: '#ff44ff', bot: '#ffff00', hair: '#ffd700', type: 1, flag: true,  female: false },
+  { x: 252, dy: 22, skin: '#d4956a', top: '#ff77bb', bot: '#ff1177', hair: '#333333', type: 2, flag: false, female: true  },
+  { x: 336, dy: 38, skin: '#f0b060', top: '#44ccff', bot: '#ff4444', hair: '#884400', type: 0, flag: false, female: false },
+  // === shown at level 2 (12 people) ===
+  { x:   8, dy: 46, skin: '#8b5a2b', top: '#ff9988', bot: '#ff5544', hair: '#ffd700', type: 2, flag: false, female: true  },
+  { x: 132, dy: 42, skin: '#3d1f0d', top: '#ffcc44', bot: '#ff6600', hair: '#333333', type: 1, flag: true,  female: false },
+  { x: 222, dy: 40, skin: '#ffcc99', top: '#ee88ff', bot: '#cc44ff', hair: '#ff6600', type: 0, flag: false, female: true  },
+  { x: 280, dy: 48, skin: '#5c3317', top: '#ffff44', bot: '#4444ff', hair: '#333333', type: 2, flag: false, female: false },
+  // === shown at level 3 — Storm Surge (16 people, umbrella holders) ===
+  { x:  38, dy: 20, skin: '#f0b060', top: '#334488', bot: '#2255aa', hair: '#ffd700', type: 1, flag: false, female: false, umbrella: true },
+  { x: 172, dy: 12, skin: '#d4956a', top: '#553366', bot: '#4422aa', hair: '#333333', type: 0, flag: false, female: true,  umbrella: true },
+  { x: 238, dy: 32, skin: '#ffcc99', top: '#445566', bot: '#334455', hair: '#222222', type: 2, flag: false, female: false, umbrella: true },
+  { x: 343, dy: 22, skin: '#8b5a2b', top: '#336655', bot: '#224433', hair: '#ffd700', type: 0, flag: false, female: true,  umbrella: true },
+  // === shown at level 4+ / endless (22 people — full beach) ===
+  { x:  76, dy: 52, skin: '#3d1f0d', top: '#44ff88', bot: '#ff4444', hair: '#333333', type: 1, flag: false, female: false },
+  { x: 116, dy:  8, skin: '#ffcc99', top: '#ffff44', bot: '#ff2288', hair: '#ffd700', type: 2, flag: true,  female: true  },
+  { x: 185, dy: 48, skin: '#5c3317', top: '#ff4444', bot: '#ffff00', hair: '#884400', type: 0, flag: false, female: false },
+  { x: 262, dy: 56, skin: '#d4956a', top: '#cc44ff', bot: '#ff6600', hair: '#222222', type: 1, flag: false, female: true  },
+  { x: 318, dy:  8, skin: '#f0b060', top: '#ff6633', bot: '#4488ff', hair: '#aa4400', type: 2, flag: false, female: false },
+  { x:  48, dy: 58, skin: '#8b5a2b', top: '#44ccff', bot: '#ff44ff', hair: '#ffd700', type: 0, flag: true,  female: true  },
 ];
 
 // ---- SURFER ----
@@ -842,15 +851,15 @@ function drawCrowdPerson(cx, py, p, cheering, jumpOff) {
   if (f) {
     // ---- FEMALE ----
     // legs (bare, skin tone)
-    px(cx - 4, py + 11 - jy, 3, 9, '#ffcc99');
-    px(cx + 1, py + 11 - jy, 3, 9, '#ffcc99');
+    px(cx - 4, py + 11 - jy, 3, 9, p.skin);
+    px(cx + 1, py + 11 - jy, 3, 9, p.skin);
     // sandals
     px(cx - 5, py + 19 - jy, 5, 2, '#cc8844');
     px(cx + 1, py + 19 - jy, 5, 2, '#cc8844');
     // bikini bottom
     px(cx - 4, py + 9 - jy,  9, 5, p.bot);
     // stomach (bare skin)
-    px(cx - 3, py + 4 - jy,  7, 6, '#ffcc99');
+    px(cx - 3, py + 4 - jy,  7, 6, p.skin);
     // bikini top (two triangle cups)
     px(cx - 4, py + 1 - jy,  4, 4, p.top);
     px(cx + 1, py + 1 - jy,  4, 4, p.top);
@@ -858,16 +867,16 @@ function drawCrowdPerson(cx, py, p, cheering, jumpOff) {
     // arms
     if (cheering) {
       const wave = Math.sin(frame * 0.25 + cx) * 3;
-      px(cx - 8, py - 5 - jy + wave,  4, 3, '#ffcc99');
-      px(cx + 5, py - 5 - jy - wave,  4, 3, '#ffcc99');
-      px(cx - 9, py - 8 - jy + wave,  3, 3, '#ffcc99');
-      px(cx + 6, py - 8 - jy - wave,  3, 3, '#ffcc99');
+      px(cx - 8, py - 5 - jy + wave,  4, 3, p.skin);
+      px(cx + 5, py - 5 - jy - wave,  4, 3, p.skin);
+      px(cx - 9, py - 8 - jy + wave,  3, 3, p.skin);
+      px(cx + 6, py - 8 - jy - wave,  3, 3, p.skin);
     } else {
-      px(cx - 7, py + 2 - jy, 3, 5, '#ffcc99');
-      px(cx + 5, py + 2 - jy, 3, 5, '#ffcc99');
+      px(cx - 7, py + 2 - jy, 3, 5, p.skin);
+      px(cx + 5, py + 2 - jy, 3, 5, p.skin);
     }
     // head
-    px(cx - 3, py - 6 - jy, 7, 7, '#ffcc99');
+    px(cx - 3, py - 6 - jy, 7, 7, p.skin);
     // long hair
     px(cx - 4, py - 9 - jy,  9, 4, p.hair);
     px(cx - 5, py - 6 - jy,  3, 9, p.hair); // left drape
@@ -884,15 +893,15 @@ function drawCrowdPerson(cx, py, p, cheering, jumpOff) {
     px(cx - 4, py + 4 - jy,  9, 9, p.top);
     if (cheering) {
       const wave = Math.sin(frame * 0.25 + cx) * 3;
-      px(cx - 8, py - 4 - jy + wave, 4, 3, '#ffcc99');
-      px(cx + 5, py - 4 - jy - wave, 4, 3, '#ffcc99');
-      px(cx - 9, py - 7 - jy + wave, 3, 3, '#ffcc99');
-      px(cx + 6, py - 7 - jy - wave, 3, 3, '#ffcc99');
+      px(cx - 8, py - 4 - jy + wave, 4, 3, p.skin);
+      px(cx + 5, py - 4 - jy - wave, 4, 3, p.skin);
+      px(cx - 9, py - 7 - jy + wave, 3, 3, p.skin);
+      px(cx + 6, py - 7 - jy - wave, 3, 3, p.skin);
     } else {
-      px(cx - 7, py + 6 - jy, 3, 5, '#ffcc99');
-      px(cx + 5, py + 6 - jy, 3, 5, '#ffcc99');
+      px(cx - 7, py + 6 - jy, 3, 5, p.skin);
+      px(cx + 5, py + 6 - jy, 3, 5, p.skin);
     }
-    px(cx - 3, py - 5 - jy, 7, 7, '#ffcc99');
+    px(cx - 3, py - 5 - jy, 7, 7, p.skin);
     // hat
     if (p.type === 0) {
       px(cx - 4, py - 8 - jy, 9, 4, p.bot);
@@ -916,6 +925,25 @@ function drawCrowdPerson(cx, py, p, cheering, jumpOff) {
     px(cx,     py - 1 - jy, 1, 2, '#cc4400');
   } else {
     px(cx - 1, py - 1 - jy, 3, 1, '#885544');
+  }
+
+  // umbrella — only during Storm Surge (level 3)
+  if (p.umbrella && level === 3) {
+    const ux = cx;
+    const uy = py - 14 - jy;  // just above head
+    // short pole
+    px(ux, uy - 2, 2, 6, '#aaaaaa');
+    // wide dome canopy (22px wide)
+    px(ux - 10, uy - 4,  22, 2, '#334488');  // bottom rim
+    px(ux - 10, uy - 6,  22, 2, '#3a4f99');  // body
+    px(ux -  8, uy - 8,  18, 2, '#3a4f99');  // upper body
+    px(ux -  4, uy - 10, 10, 2, '#334488');  // top dome
+    // highlight streak
+    px(ux -  4, uy - 9,   4, 2, '#5566cc');
+    // scalloped bottom edge dips
+    px(ux - 10, uy - 2,   4, 2, '#223377');
+    px(ux -  2, uy - 2,   4, 2, '#223377');
+    px(ux +  6, uy - 2,   4, 2, '#223377');
   }
 }
 
@@ -956,9 +984,10 @@ function drawBeach() {
   px(GW - 10,BEACH_Y - 50, 3,  3, '#885500');
   px(GW - 6, BEACH_Y - 48, 3,  3, '#885500');
 
-  // draw crowd
+  // draw crowd — grows each round, full from level 4 onward
   const cheering = cheerFrames > 0;
-  crowd.forEach((p, i) => {
+  const crowdCount = endless ? crowd.length : [4, 8, 12, 16, crowd.length][Math.min(level, 4)];
+  crowd.slice(0, crowdCount).forEach((p, i) => {
     // each person jumps at slightly different times for a wave effect
     const jumpDelay = i * 4;
     const jumpPhase = Math.max(0, cheerFrames - jumpDelay);
