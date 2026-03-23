@@ -332,6 +332,9 @@ let spinFrames = 0;
 let trickType  = 1; // 1=360spin 2=boardflip 3=handstand
 let trickIndex = 0; // cycles through [1,3,2]
 let bonusWaves = [];
+let jetskis = [];
+let jetskiTimer = 0;
+let jetskiInterval = 900 + Math.random() * 600;
 let lastCheerMilestone = 0;
 let lastBigCheer = 0;
 let cheerPopups = [];
@@ -483,6 +486,9 @@ function startGame() {
   obstacles = [];
   particles = [];
   bonusWaves = [];
+  jetskis = [];
+  jetskiTimer = 0;
+  jetskiInterval = 900 + Math.random() * 600;
   pendingSpawns = [];
   cheerFrames = 0;
   spinFrames = 0;
@@ -1429,6 +1435,81 @@ function spawnBonusWave() {
   });
 }
 
+function spawnJetski() {
+  const goingRight = Math.random() < 0.5;
+  const y = GH * 0.28 + Math.random() * (GH * 0.5 - GH * 0.28 - 20);
+  const spd = 4.5 + Math.random() * 2;
+  jetskis.push({
+    x: goingRight ? -60 : GW + 60,
+    y,
+    vx: goingRight ? spd : -spd,
+    vy: 0.4 + Math.random() * 0.4,
+    dir: goingRight ? 1 : -1
+  });
+}
+
+function drawJetski(o) {
+  const x = Math.floor(o.x);
+  const y = Math.floor(o.y);
+  const d = o.dir;
+
+  ctx.save();
+  if (d === -1) {
+    ctx.translate(x + 24, y);
+    ctx.scale(-1, 1);
+    ctx.translate(-24, 0);
+  } else {
+    ctx.translate(x, y);
+  }
+
+  // === WAKE SPRAY ===
+  ctx.globalAlpha = 0.65;
+  px(-22,  8, 24, 4, '#cceeff');
+  px(-26, 11, 14, 3, '#ffffff');
+  px(-18, 13, 10, 2, '#ffffff');
+  ctx.globalAlpha = 1;
+
+  // === YELLOW SPEEDBOAT HULL ===
+  px(  0,  7, 48, 5, '#ffdd00');  // main hull
+  px(  0,  9, 50, 4, '#ccaa00');  // hull underside
+  px(  4,  3, 38, 5, '#ffee55');  // upper deck
+  px( 40,  5,  8, 4, '#ffcc00');  // nose taper
+  px( 46,  7,  4, 2, '#ffaa00');  // nose tip
+  px(  0,  5,  5, 5, '#ddbb00');  // stern detail
+  px(  0,  9,  7, 2, '#886600');  // engine block
+
+  // === WINDSHIELD ===
+  px(  8,  0, 12, 5, '#88ccff');
+  ctx.globalAlpha = 0.6;
+  px(  9,  0,  4, 3, '#ffffff');  // glare
+  ctx.globalAlpha = 1;
+
+  // === WOMAN IN BIKINI ===
+  // legs
+  px( 21,  2,  3, 6, '#f0a875');
+  px( 25,  2,  3, 6, '#f0a875');
+  // bikini bottom
+  px( 20,  0, 10, 4, '#ff44bb');
+  // stomach
+  px( 21, -6,  7, 7, '#f0a875');
+  // bikini top cups
+  px( 20,-10,  4, 5, '#ff44bb');
+  px( 25,-10,  4, 5, '#ff44bb');
+  // arms wide out for balance
+  px( 11, -8,  9, 3, '#f0a875');  // left arm (trailing)
+  px( 29, -9,  8, 3, '#f0a875');  // right arm (forward)
+  // head
+  px( 21,-17,  7, 7, '#f0a875');
+  // hair flowing behind in wind (trails left = back of boat)
+  px( 20,-20,  9, 3, '#c07830');  // crown
+  px( 10,-18, 13, 3, '#c07830');  // first flow
+  px(  5,-15, 11, 3, '#c07830');  // second flow
+  px(  2,-12,  8, 3, '#c07830');  // tip strand
+  px(  4,-10,  5, 2, '#a06020');  // wisp
+
+  ctx.restore();
+}
+
 function drawBonusWave(o) {
   const x = Math.floor(o.x);
   const y = Math.floor(o.y);
@@ -1656,6 +1737,19 @@ function update(dt) {
     return true;
   });
 
+  // ---- JETSKIS ----
+  jetskiTimer += dt;
+  if (jetskiTimer >= jetskiInterval) {
+    jetskiTimer = 0;
+    jetskiInterval = 900 + Math.random() * 600;
+    spawnJetski();
+  }
+  jetskis = jetskis.filter(j => {
+    j.x += j.vx * dt;
+    j.y = Math.min(j.y + j.vy * dt, GH * 0.5 - 20);
+    return j.dir === 1 ? j.x < GW + 80 : j.x > -80;
+  });
+
   // Occasional random fill between formations
   spawnTimer += dt;
   const randInterval = Math.max(90, lCfg.formInterval * 0.7);
@@ -1782,6 +1876,9 @@ function draw() {
     else if (obs.type === 'sealog') drawSeaLog(obs);
     else                          drawJellyfish(obs);
   });
+
+  // Jetskis (decorative)
+  jetskis.forEach(j => drawJetski(j));
 
   // Bonus waves
   bonusWaves.forEach(w => drawBonusWave(w));
