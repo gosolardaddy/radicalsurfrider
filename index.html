@@ -51,6 +51,10 @@ if (window.visualViewport) window.visualViewport.addEventListener('resize', resi
 resize();
 window.addEventListener('resize', resize);
 
+// ---- COVER IMAGE ----
+const coverImg = new Image();
+coverImg.src = 'cover.jpg';
+
 // ---- LEADERBOARD (Firebase Realtime Database) ----
 const DB_URL = 'https://radical-surfrider-default-rtdb.firebaseio.com/leaderboard.json';
 let lbCache = [];
@@ -1206,17 +1210,17 @@ function drawLeaderboard(centerX, startY) {
     ctx.fillText('NO SCORES YET', centerX, startY + 18);
     return;
   }
-  const medals = ['#ffd700','#cccccc','#cd7f32','#88aaff','#88aaff','#aaaaaa','#aaaaaa','#aaaaaa','#aaaaaa','#aaaaaa'];
+  const medals = ['#ffd700','#cccccc','#cd7f32','#88aaff','#88aaff','#aaaaaa','#aaaaaa','#aaaaaa'];
   const ranks  = ['1ST','2ND','3RD','4TH','5TH','6TH','7TH','8TH'];
-  lb.forEach((e, i) => {
+  lb.slice(0, 8).forEach((e, i) => {
     ctx.fillStyle = medals[i] || '#aaaaaa';
     ctx.font = "7px 'Press Start 2P', monospace";
     ctx.textAlign = 'left';
-    ctx.fillText(ranks[i], centerX - 90, startY + 18 + i * 14);
+    ctx.fillText(ranks[i] || (i+1)+'TH', centerX - 90, startY + 18 + i * 13);
     ctx.textAlign = 'center';
-    ctx.fillText(e.name, centerX, startY + 18 + i * 14);
+    ctx.fillText(e.name, centerX, startY + 18 + i * 13);
     ctx.textAlign = 'right';
-    ctx.fillText(e.score, centerX + 90, startY + 18 + i * 14);
+    ctx.fillText(e.score, centerX + 90, startY + 18 + i * 13);
   });
   ctx.textAlign = 'left';
 }
@@ -1309,9 +1313,18 @@ function drawWin() {
 }
 
 function drawTitle() {
-  drawOcean();
+  // Cover art — full width, aspect-ratio preserved at top
+  const coverH = coverImg.complete && coverImg.naturalWidth
+    ? Math.round(GW * coverImg.naturalHeight / coverImg.naturalWidth)
+    : 154;
+  if (coverImg.complete && coverImg.naturalWidth) {
+    ctx.drawImage(coverImg, 0, 0, GW, coverH);
+  } else {
+    drawOcean(); // fallback while image loads
+  }
+  drawScanlines();
 
-  // Speedboat — update position (draw after leaderboard so she's fully visible)
+  // Speedboat — update position
   if (titleBoat) {
     titleBoat.x += titleBoat.vx;
     titleBoat.y += titleBoat.vy;
@@ -1325,76 +1338,42 @@ function drawTitle() {
     if (titleBoatTimer >= 240) {
       titleBoat = {
         x:   titleBoatDir === 1 ? -70 : GW + 70,
-        y:   GH * 0.88,
+        y:   coverH + 180,
         vx:  titleBoatDir * 6,
-        vy:  titleBoatDir * 0.4,
+        vy:  titleBoatDir * 0.3,
         dir: titleBoatDir
       };
       titleBoatTimer = 0;
     }
   }
 
-  const bob = Math.sin(frame * 0.05) * 4;
-  drawSurfer(GW / 2, GH * 0.28 + bob, false);
-  drawScanlines();
+  const panelY = coverH + 4;
 
-  const panelY = GH * 0.35;
-
-  // Title panel (shortened)
-  ctx.fillStyle = 'rgba(0,0,0,0.82)';
-  ctx.fillRect(18, panelY, GW - 36, 218);
-  ctx.strokeStyle = '#00ff44';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(18, panelY, GW - 36, 218);
-  ctx.strokeStyle = '#ff6600';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(22, panelY + 4, GW - 44, 210);
+  // Panel — instructions + tap to start only (title is in the cover art)
+  ctx.fillStyle = 'rgba(0,0,0,0.86)';
+  ctx.fillRect(18, panelY, GW - 36, 118);
 
   ctx.textAlign = 'center';
-
-  // Helper: draw text with 3D pixel-extrusion shadow
-  function draw3D(text, cx, cy, size, colorTop, colorBot, shadowCol) {
-    const off = Math.max(3, Math.floor(size / 9));
-    ctx.font = `${size}px 'Press Start 2P', monospace`;
-    ctx.fillStyle = shadowCol;
-    ctx.fillText(text, cx + off, cy + off);
-    ctx.fillStyle = 'rgba(255,255,255,0.18)';
-    ctx.fillText(text, cx - 1, cy - 1);
-    const grad = ctx.createLinearGradient(0, cy - size, 0, cy + 4);
-    grad.addColorStop(0, colorTop);
-    grad.addColorStop(1, colorBot);
-    ctx.fillStyle = grad;
-    ctx.fillText(text, cx, cy);
-  }
-
-  // RADICAL
-  draw3D('RADICAL',   GW / 2, panelY + 60,  30, '#ffee00', '#ff8800', '#7a1100');
-  // SURFRIDER
-  draw3D('SURFRIDER', GW / 2, panelY + 104, 26, '#ff9900', '#ff2200', '#550000');
-
-  // Subtitle
-  ctx.fillStyle = '#00ff44';
-  ctx.font = "9px 'Press Start 2P', monospace";
-  ctx.fillText('~ AN 8-BIT SURF ODYSSEY ~', GW / 2, panelY + 130);
 
   // Instructions
   ctx.fillStyle = '#999999';
   ctx.font = "8px 'Press Start 2P', monospace";
-  ctx.fillText('DRAG LEFT OR RIGHT TO DODGE', GW / 2, panelY + 162);
+  ctx.fillText('DRAG LEFT OR RIGHT', GW / 2, panelY + 38);
+  ctx.fillText('TO DODGE OBSTACLES', GW / 2, panelY + 56);
 
   // Blinking start prompt
   if (Math.floor(frame / 28) % 2 === 0) {
     ctx.fillStyle = '#ff6600';
     ctx.font = "10px 'Press Start 2P', monospace";
-    ctx.fillText('>> TAP TO START <<', GW / 2, panelY + 200);
+    ctx.fillText('>> TAP TO START <<', GW / 2, panelY + 96);
   }
 
-  // Leaderboard — pulled up below shortened box
-  ctx.globalAlpha = 0.9;
-  drawLeaderboard(GW / 2, panelY + 232);
+  // Leaderboard
+  ctx.globalAlpha = 0.92;
+  drawLeaderboard(GW / 2, panelY + 130);
   ctx.globalAlpha = 1;
 
-  // Speedboat drawn last so she's on top of everything
+  // Speedboat drawn last
   if (titleBoat) drawJetski(titleBoat);
 
   ctx.textAlign = 'left';
