@@ -356,7 +356,7 @@ const BEACH_Y = GH - 85;
 // x = horizontal pos, dy = depth into beach from BEACH_Y (higher = further from water)
 const crowd = [
   // === shown at level 0 (4 people — sparse, spread across beach) ===
-  { x:  18, dy: 12, skin: '#ffcc99', top: '#ff4444', bot: '#ffff44', hair: '#ffd700', type: 0, flag: true,  female: false },
+  { x:  52, dy: 12, skin: '#ffcc99', top: '#ff4444', bot: '#ffff44', hair: '#ffd700', type: 0, flag: true,  female: false },
   { x: 100, dy: 20, skin: '#c8803a', top: '#ff88cc', bot: '#ff44aa', hair: '#222222', type: 1, flag: false, female: true  },
   { x: 205, dy: 14, skin: '#f0b060', top: '#44ff88', bot: '#ffffff', hair: '#aa4400', type: 2, flag: false, female: false },
   { x: 305, dy: 18, skin: '#8b5a2b', top: '#4488ff', bot: '#ffff00', hair: '#333333', type: 1, flag: false, female: false },
@@ -366,12 +366,12 @@ const crowd = [
   { x: 252, dy: 22, skin: '#d4956a', top: '#ff77bb', bot: '#ff1177', hair: '#333333', type: 2, flag: false, female: true  },
   { x: 336, dy: 38, skin: '#f0b060', top: '#44ccff', bot: '#ff4444', hair: '#884400', type: 0, flag: false, female: false },
   // === shown at level 2 (12 people) ===
-  { x:   8, dy: 46, skin: '#8b5a2b', top: '#ff9988', bot: '#ff5544', hair: '#ffd700', type: 2, flag: false, female: true  },
+  { x:  50, dy: 46, skin: '#8b5a2b', top: '#ff9988', bot: '#ff5544', hair: '#ffd700', type: 2, flag: false, female: true  },
   { x: 132, dy: 42, skin: '#3d1f0d', top: '#ffcc44', bot: '#ff6600', hair: '#333333', type: 1, flag: true,  female: false },
   { x: 222, dy: 40, skin: '#ffcc99', top: '#ee88ff', bot: '#cc44ff', hair: '#ff6600', type: 0, flag: false, female: true  },
   { x: 280, dy: 48, skin: '#5c3317', top: '#ffff44', bot: '#4444ff', hair: '#333333', type: 2, flag: false, female: false },
   // === shown at level 3 — Storm Surge (16 people, umbrella holders) ===
-  { x:  38, dy: 20, skin: '#f0b060', top: '#334488', bot: '#2255aa', hair: '#ffd700', type: 1, flag: false, female: false, umbrella: true },
+  { x:  60, dy: 20, skin: '#f0b060', top: '#334488', bot: '#2255aa', hair: '#ffd700', type: 1, flag: false, female: false, umbrella: true },
   { x: 172, dy: 12, skin: '#d4956a', top: '#553366', bot: '#4422aa', hair: '#333333', type: 0, flag: false, female: true,  umbrella: true },
   { x: 238, dy: 32, skin: '#ffcc99', top: '#445566', bot: '#334455', hair: '#222222', type: 2, flag: false, female: false, umbrella: true },
   { x: 343, dy: 22, skin: '#8b5a2b', top: '#336655', bot: '#224433', hair: '#ffd700', type: 0, flag: false, female: true,  umbrella: true },
@@ -967,28 +967,65 @@ function drawBeach() {
   px(0, BEACH_Y - 2, GW, 3, '#aaddff');
   ctx.globalAlpha = 1;
 
-  // palm trees (left and right edges)
-  // left palm
-  px(4,  BEACH_Y - 40, 4, 40, '#7a5a30'); // trunk
-  px(2,  BEACH_Y - 44, 6, 6,  '#5a4020'); // trunk knot
-  // fronds
-  px(-10, BEACH_Y - 52, 20, 4, '#228822');
-  px(-6,  BEACH_Y - 56, 16, 4, '#33aa33');
-  px(-2,  BEACH_Y - 60, 10, 4, '#228822');
-  px(4,   BEACH_Y - 64, 6,  4, '#33aa33');
-  // coconuts
-  px(2,  BEACH_Y - 50, 3, 3, '#885500');
-  px(6,  BEACH_Y - 48, 3, 3, '#885500');
+  // lifeguard tower — left side of beach, Venice Beach style
+  const lx = 14;
+  const ly = BEACH_Y;  // box sits on sand, flagpole sticks above shoreline
 
-  // right palm
-  px(GW - 8, BEACH_Y - 40, 4, 40, '#7a5a30');
-  px(GW - 9, BEACH_Y - 44, 6, 6,  '#5a4020');
-  px(GW - 6, BEACH_Y - 52, 20, 4, '#228822');
-  px(GW - 8, BEACH_Y - 56, 16, 4, '#33aa33');
-  px(GW - 8, BEACH_Y - 60, 10, 4, '#228822');
-  px(GW - 10,BEACH_Y - 64, 6,  4, '#33aa33');
-  px(GW - 10,BEACH_Y - 50, 3,  3, '#885500');
-  px(GW - 6, BEACH_Y - 48, 3,  3, '#885500');
+  // === FLAGPOLE ===
+  px(lx + 13, ly - 36, 2, 36, '#cccccc');
+  // American flag (waving)
+  const fw = Math.round(Math.sin(frame * 0.07) * 2);
+  px(lx + 15, ly - 36,        14,  2, '#cc2200');
+  px(lx + 15, ly - 34,         6,  2, '#3344bb');
+  px(lx + 21, ly - 34,         8,  2, '#ffffff');
+  px(lx + 15, ly - 32,        14,  2, '#cc2200');
+  px(lx + 15, ly - 30,        14,  2, '#ffffff');
+  px(lx + 15 + fw, ly - 28,   12,  2, '#cc2200');
+  px(lx + 15 + fw, ly - 26,   10,  2, '#ffffff');
+
+  // === ROOF OVERHANG ===
+  px(lx - 4,  ly - 5,  38, 3, '#3aacac');  // overhang
+  px(lx - 2,  ly - 3,  34, 3, '#5fc8c8');  // roof face
+
+  // === BOX BODY ===
+  px(lx,      ly,       30, 22, '#5fc8c8');  // main teal walls
+  px(lx,      ly,       30,  2, '#88dddd');  // top highlight
+  px(lx,      ly,        2, 22, '#88dddd');  // left highlight
+  px(lx + 27, ly,        3, 22, '#3aacac');  // right shadow
+
+  // === WINDOW ===
+  px(lx + 4,  ly + 5,  14, 10, '#2288aa');  // window recess
+  px(lx + 4,  ly + 5,  14,  2, '#44aacc');  // window top trim
+  px(lx + 4,  ly + 5,   2, 10, '#44aacc');  // window left trim
+  ctx.globalAlpha = 0.35;
+  px(lx + 6,  ly + 7,   5,  4, '#ffffff');  // glass glare
+  ctx.globalAlpha = 1;
+
+  // === RED RESCUE BUOY (right side) ===
+  px(lx + 24, ly + 3,   5,  2, '#cc2200');
+  px(lx + 23, ly + 5,   6,  6, '#cc2200');
+  px(lx + 24, ly + 7,   4,  2, '#ffffff');  // buoy stripe
+  px(lx + 23, ly + 11,  6,  2, '#cc2200');
+
+  // === CROSS-BRACED LEGS ===
+  px(lx + 3,  ly + 22,  3, 20, '#4dbbbb');  // left leg
+  px(lx + 24, ly + 22,  3, 20, '#4dbbbb');  // right leg
+  // X bracing (diagonal steps)
+  px(lx + 6,  ly + 24,  4,  2, '#3aacac');
+  px(lx + 10, ly + 28,  4,  2, '#3aacac');
+  px(lx + 14, ly + 32,  4,  2, '#3aacac');
+  px(lx + 18, ly + 28,  4,  2, '#3aacac');
+  px(lx + 22, ly + 24,  4,  2, '#3aacac');
+
+  // === STAIRCASE (left side, angled down) ===
+  px(lx - 2,  ly + 10,  3, 14, '#4dbbbb');  // stair post
+  px(lx - 10, ly + 22,  3, 10, '#4dbbbb');  // bottom post
+  // railing
+  px(lx - 10, ly + 8,   2, 16, '#5fc8c8');
+  // steps
+  px(lx - 4,  ly + 12,  6,  2, '#5fc8c8');
+  px(lx - 7,  ly + 16,  6,  2, '#5fc8c8');
+  px(lx - 10, ly + 20,  6,  2, '#5fc8c8');
 
   // draw crowd — grows each round, full from level 4 onward
   const cheering = cheerFrames > 0;
