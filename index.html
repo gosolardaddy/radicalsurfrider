@@ -2039,9 +2039,6 @@ let adFallbackTimer = null;
 function showAdThenStart() {
   const adContainer = document.getElementById('adContainer');
 
-  // Show black screen immediately so player sees something
-  adContainer.style.display = 'block';
-
   // Fallback: if ad never plays within 6s, start anyway
   adFallbackTimer = setTimeout(onAdDone, 6000);
 
@@ -2066,6 +2063,7 @@ function showAdThenStart() {
           adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE,      onAdDone);
           adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED,       onAdDone);
           adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdDone);
+          adContainer.style.display = 'block';
           try {
             adsManager.init(window.innerWidth, window.innerHeight, google.ima.ViewMode.FULLSCREEN);
             adsManager.start();
