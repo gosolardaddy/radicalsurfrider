@@ -1832,53 +1832,66 @@ const AD_TAG_URL = 'https://pubads.g.doubleclick.net/gampad/ads' +
   '&ciu_szs=300x250%2C728x90&gdfp_req=1&output=vast' +
   '&unviewed_position_start=1&env=vp&impl=s&correlator=';
 
+let adDisplayContainer = null;
 let adsLoader = null;
 let adsManager = null;
-let adInited = false;
+let adSystemReady = false;
+let adFallbackTimer = null;
 
-function showAdThenStart() {
-  // If IMA unavailable (ad blocker, network error) just start the game
-  if (typeof google === 'undefined' || !google.ima) { startGame(); return; }
+function initAdSystem() {
+  if (adSystemReady) return;
+  if (typeof google === 'undefined' || !google.ima) return;
+  adSystemReady = true;
 
   const adContainer = document.getElementById('adContainer');
   const adVideo     = document.getElementById('adVideo');
 
-  if (!adInited) {
-    adInited = true;
-    const adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, adVideo);
-    adDisplayContainer.initialize();
-    adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+  adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, adVideo);
+  adsLoader = new google.ima.AdsLoader(adDisplayContainer);
 
-    adsLoader.addEventListener(
-      google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-      e => {
-        adsManager = e.getAdsManager(adVideo);
-        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE,      onAdDone);
-        adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED,       onAdDone);
-        adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdDone);
-        adContainer.style.display = 'block';
-        try {
-          adsManager.init(window.innerWidth, window.innerHeight, google.ima.ViewMode.FULLSCREEN);
-          adsManager.start();
-        } catch(e) { onAdDone(); }
-      }
-    );
-    adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdDone);
-  }
+  adsLoader.addEventListener(
+    google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+    e => {
+      clearTimeout(adFallbackTimer);
+      if (adsManager) adsManager.destroy();
+      adsManager = e.getAdsManager(adVideo);
+      adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE,      onAdDone);
+      adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED,       onAdDone);
+      adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdDone);
+      adContainer.style.display = 'block';
+      try {
+        adsManager.init(window.innerWidth, window.innerHeight, google.ima.ViewMode.FULLSCREEN);
+        adsManager.start();
+      } catch(e) { onAdDone(); }
+    }
+  );
+  adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdDone);
+}
+
+function showAdThenStart() {
+  if (typeof google === 'undefined' || !google.ima) { startGame(); return; }
+
+  initAdSystem();
+  if (!adSystemReady) { startGame(); return; }
+
+  adDisplayContainer.initialize();
+
+  // Safety fallback — if ad never fires after 5s, start anyway
+  adFallbackTimer = setTimeout(onAdDone, 5000);
 
   const req = new google.ima.AdsRequest();
   req.adTagUrl = AD_TAG_URL;
-  req.linearAdSlotWidth    = window.innerWidth;
-  req.linearAdSlotHeight   = window.innerHeight;
+  req.linearAdSlotWidth     = window.innerWidth;
+  req.linearAdSlotHeight    = window.innerHeight;
   req.nonLinearAdSlotWidth  = window.innerWidth;
   req.nonLinearAdSlotHeight = window.innerHeight * 0.3;
   adsLoader.requestAds(req);
 }
 
 function onAdDone() {
+  clearTimeout(adFallbackTimer);
   document.getElementById('adContainer').style.display = 'none';
   if (adsManager) { adsManager.destroy(); adsManager = null; }
-  adInited = false; // reset so next restart gets a fresh ad
   startGame();
 }
 </script>
