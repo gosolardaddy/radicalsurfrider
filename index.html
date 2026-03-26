@@ -2036,43 +2036,47 @@ let adsManager = null;
 let adSystemReady = false;
 let adFallbackTimer = null;
 
-function initAdSystem() {
-  if (adSystemReady) return;
-  if (typeof google === 'undefined' || !google.ima) return;
-  adSystemReady = true;
-
-  const adContainer = document.getElementById('adContainer');
-  const adVideo     = document.getElementById('adVideo');
-
-  adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, adVideo);
-  adsLoader = new google.ima.AdsLoader(adDisplayContainer);
-
-  adsLoader.addEventListener(
-    google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-    e => {
-      clearTimeout(adFallbackTimer);
-      if (adsManager) adsManager.destroy();
-      adsManager = e.getAdsManager(adVideo);
-      adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE,      onAdDone);
-      adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED,       onAdDone);
-      adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdDone);
-      adContainer.style.display = 'block';
-      try {
-        adsManager.init(window.innerWidth, window.innerHeight, google.ima.ViewMode.FULLSCREEN);
-        adsManager.start();
-      } catch(e) { onAdDone(); }
-    }
-  );
-  adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdDone);
-}
-
 function showAdThenStart() {
+  const adContainer = document.getElementById('adContainer');
+
+  // Show black screen immediately so player sees something
+  adContainer.style.display = 'block';
+
+  // Fallback: if ad never plays within 6s, start anyway
+  adFallbackTimer = setTimeout(onAdDone, 6000);
+
+  if (typeof google === 'undefined' || !google.ima) {
+    console.warn('IMA not loaded'); onAdDone(); return;
+  }
+
   try {
-    if (typeof google === 'undefined' || !google.ima) { startGame(); return; }
-    initAdSystem();
-    if (!adSystemReady) { startGame(); return; }
-    adDisplayContainer.initialize();
-    adFallbackTimer = setTimeout(onAdDone, 5000);
+    const adVideo = document.getElementById('adVideo');
+
+    if (!adSystemReady) {
+      adSystemReady = true;
+      adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, adVideo);
+      adDisplayContainer.initialize(); // call once, while element is visible
+      adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+      adsLoader.addEventListener(
+        google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+        e => {
+          clearTimeout(adFallbackTimer);
+          if (adsManager) adsManager.destroy();
+          adsManager = e.getAdsManager(adVideo);
+          adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE,      onAdDone);
+          adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED,       onAdDone);
+          adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdDone);
+          try {
+            adsManager.init(window.innerWidth, window.innerHeight, google.ima.ViewMode.FULLSCREEN);
+            adsManager.start();
+          } catch(e) { onAdDone(); }
+        }
+      );
+      adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, e => {
+        console.warn('IMA loader error:', e.getError()); onAdDone();
+      });
+    }
+
     const req = new google.ima.AdsRequest();
     req.adTagUrl = AD_TAG_URL;
     req.linearAdSlotWidth     = window.innerWidth;
@@ -2081,8 +2085,7 @@ function showAdThenStart() {
     req.nonLinearAdSlotHeight = window.innerHeight * 0.3;
     adsLoader.requestAds(req);
   } catch(e) {
-    console.warn('Ad error:', e);
-    startGame();
+    console.warn('Ad exception:', e); onAdDone();
   }
 }
 
@@ -2090,6 +2093,7 @@ function onAdDone() {
   clearTimeout(adFallbackTimer);
   document.getElementById('adContainer').style.display = 'none';
   if (adsManager) { adsManager.destroy(); adsManager = null; }
+  adSystemReady = false; // reset for next restart
   startGame();
 }
 </script>
