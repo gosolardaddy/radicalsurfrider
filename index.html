@@ -25,6 +25,10 @@
 </head>
 <body>
 <canvas id="game"></canvas>
+<!-- Ad overlay -->
+<div id="adContainer" style="position:fixed;display:none;top:0;left:0;width:100%;height:100%;z-index:999;background:#000;">
+  <video id="adVideo" playsinline style="width:100%;height:100%;object-fit:contain;"></video>
+</div>
 <audio id="woahSfx" src="woah.mp3" preload="auto"></audio>
 <audio id="bgmAudio" src="bgm.mp3" preload="auto" loop></audio>
 <audio id="crashSfx" src="crash.mp3" preload="auto"></audio>
@@ -478,7 +482,7 @@ function handleInput() {
   if (state === 'nameentry') return;
   initAudio(); // must be triggered by user gesture
   if (state === 'title') { startGame(); return; }
-  if (state === 'dead')  { startGame(); return; }
+  if (state === 'dead')  { showAdThenStart(); return; }
 }
 
 function startGame() {
@@ -2015,6 +2019,79 @@ function loop(timestamp) {
 }
 
 requestAnimationFrame(loop);
+</script>
+<!-- Google IMA SDK -->
+<script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+<script>
+// ---- REWARDED ADS (Google IMA) ----
+// Swap AD_TAG_URL for your real Google Ad Manager tag when ready.
+const AD_TAG_URL = 'https://pubads.g.doubleclick.net/gampad/ads' +
+  '?iu=/21775744923/external/single_preroll_skippable&sz=640x480' +
+  '&ciu_szs=300x250%2C728x90&gdfp_req=1&output=vast' +
+  '&unviewed_position_start=1&env=vp&impl=s&correlator=';
+
+let adDisplayContainer = null;
+let adsLoader = null;
+let adsManager = null;
+let adSystemReady = false;
+let adFallbackTimer = null;
+
+function initAdSystem() {
+  if (adSystemReady) return;
+  if (typeof google === 'undefined' || !google.ima) return;
+  adSystemReady = true;
+
+  const adContainer = document.getElementById('adContainer');
+  const adVideo     = document.getElementById('adVideo');
+
+  adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, adVideo);
+  adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+
+  adsLoader.addEventListener(
+    google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+    e => {
+      clearTimeout(adFallbackTimer);
+      if (adsManager) adsManager.destroy();
+      adsManager = e.getAdsManager(adVideo);
+      adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE,      onAdDone);
+      adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED,       onAdDone);
+      adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdDone);
+      adContainer.style.display = 'block';
+      try {
+        adsManager.init(window.innerWidth, window.innerHeight, google.ima.ViewMode.FULLSCREEN);
+        adsManager.start();
+      } catch(e) { onAdDone(); }
+    }
+  );
+  adsLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, onAdDone);
+}
+
+function showAdThenStart() {
+  try {
+    if (typeof google === 'undefined' || !google.ima) { startGame(); return; }
+    initAdSystem();
+    if (!adSystemReady) { startGame(); return; }
+    adDisplayContainer.initialize();
+    adFallbackTimer = setTimeout(onAdDone, 5000);
+    const req = new google.ima.AdsRequest();
+    req.adTagUrl = AD_TAG_URL;
+    req.linearAdSlotWidth     = window.innerWidth;
+    req.linearAdSlotHeight    = window.innerHeight;
+    req.nonLinearAdSlotWidth  = window.innerWidth;
+    req.nonLinearAdSlotHeight = window.innerHeight * 0.3;
+    adsLoader.requestAds(req);
+  } catch(e) {
+    console.warn('Ad error:', e);
+    startGame();
+  }
+}
+
+function onAdDone() {
+  clearTimeout(adFallbackTimer);
+  document.getElementById('adContainer').style.display = 'none';
+  if (adsManager) { adsManager.destroy(); adsManager = null; }
+  startGame();
+}
 </script>
 </body>
 </html>
